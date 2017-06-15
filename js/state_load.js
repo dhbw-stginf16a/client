@@ -16,7 +16,13 @@ var loadState = {
 
         // Load all our assets
         game.load.spritesheet('button', 'assets/button.png', 120, 40);
+        game.load.spritesheet('answer_left', 'assets/answer_left.png', 381, 100);
+        game.load.spritesheet('answer_right', 'assets/answer_right.png', 381, 100);
+        game.load.image('question', 'assets/question.png');
         game.load.image('background', 'assets/background.png');
+        game.load.image('popup_bg', 'assets/popup_background.png');
+        game.load.image('close', 'assets/orb-blue.png');
+
     },
     create: function () {
         //Start the menu state

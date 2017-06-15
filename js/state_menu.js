@@ -16,6 +16,6 @@ var menuState = {
 
     start: function () {
         //Go to the play state
-        game.state.start('lobby');
+        game.state.start('play');
     }
 };
