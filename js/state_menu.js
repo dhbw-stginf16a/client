@@ -60,7 +60,7 @@ var menuState = {
             const gameCode = this._inputGameCode.text.text;
             console.log('state-menu: value of gameCode', gameCode);
             if(gameCode !== null && gameCode !== undefined && gameCode !== ''){
-                game.state.start('lobby', true, false, gameCode, playerName);
+                game.state.start('lobby', true, false, gameCode, playerName, true);
             }
         }
     }
