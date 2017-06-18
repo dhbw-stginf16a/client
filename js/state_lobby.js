@@ -4,7 +4,6 @@
 /*
 TODO diplay game ID maybe in a (readOnly) TextField
     maybe also a copy to clipboard button
-TODO add start Game Button if leader of the game
  */
 
 /**
@@ -30,7 +29,7 @@ var lobbyState = {
         /*import {Socket} from "phoenix";
 
         socketStateLobby = new Socket("ws://localhost:4000/socket", {params: {token: window.userToken}});*/
-        console.log('state_lobby: received: ', gameCode, playerName);
+        console.log('state_lobby: received: ', gameCode, playerName, isLeader);
         if(gameCode === null || gameCode ===  undefined || playerName === undefined || playerName === null){ // this means that something went wrong in joining the game
 
         } else {
@@ -39,7 +38,12 @@ var lobbyState = {
             this._playerName = playerName;
 
             //Add this player to be displayed first
-            this.updatePlayers([{name: playerName, id: 0/*TODO add right id here (This is in the response of join_game)*/, team:1}]);
+            this.updatePlayers([{
+                name: playerName,
+                id: 0/*TODO add right id here (This is in the response of join_game)*/,
+                team: 1,
+                ready: false
+            }]);
 
             //Heading of Lobby
             this._nameLabel = game.add.text(game.world.centerX, 80, 'Brettprojekt Lobby: ' + gameCode, { font: '50px Arial', fill: '#ffffff' });
@@ -71,9 +75,7 @@ var lobbyState = {
         console.log('lobby-state: received lobby_update', event);
         this._maxTeams = event.max_teams;
         if( this._maxTeams < this._players[0].team){
-            //TODO update Team
-            this._players[0].team = 1;
-            this.updatePlayers([this._players[0]]);
+            this.setTeam(1);
         }
         if(this._startGameButton !== undefined){
             this._startGameButton.visible = event.startable;//TODO only show for leader
@@ -85,7 +87,6 @@ var lobbyState = {
      * Updates the shown player list with the new Teams and Colors
      *
      * the given list doesn't have to contain all players
-     * TODO add readiness to each player
      * @param editPlayers the updated player list
      */
     updatePlayers: function(editPlayers){
@@ -93,13 +94,16 @@ var lobbyState = {
         const offset = 120;
         const xOfName = 200;
         const xOfTeam = 500;
+        const xOfReady = 525;
         const thisFontStyle = { font: 'bold 18px Arial'};
+        const readyStyle = {font: 'bold 18px Arial'};
         const colors = {
             1:'#F00',
             2:'#0F0',
             3:'#F0F',
             4:'#FF0',
             5:'#00F', 6:'#0FF', 7:'#500', 8:'#050', 9:'#505', 10:'#550', 11:'#005', 12:'#055'};
+        const colorReady = {true: '#0F0', false: '#F00'};
 
         for(const editedPlayerID in editPlayers){
             const editedPlayer = editPlayers[editedPlayerID];
@@ -116,21 +120,35 @@ var lobbyState = {
             }
 
             thisFontStyle.fill = colors[editedPlayer.team];
+            readyStyle.fill = colorReady[editedPlayer.ready];
+            const stringReady = editedPlayer.ready ? 'ready' : 'unready';
 
             if(found !== null){
                 found._lobbyViewName.setStyle(thisFontStyle);
+
                 found._lobbyViewTeam.setStyle(thisFontStyle);
                 found._lobbyViewTeam.text = found.team = editedPlayer.team;
+
+                found._lobbyViewReadiness.text = stringReady;
+                found._lobbyViewReadiness.setStyle(readyStyle);
             } else {
                 this._players.push(editedPlayer);
-                thisFontStyle.fill = colors[editedPlayer.team];
                 const positionY = offset + this._players.length * lineHeight;
                 /*console.log('state-lobby:', thisFontStyle, lineHeight, offset, positionY);
                 console.log('state-lobby:', editedPlayer);*/
+
+                //show the name on screen
                 editedPlayer._lobbyViewName = game.add.text(xOfName, positionY, editedPlayer.name, thisFontStyle);
                 editedPlayer._lobbyViewName.anchor.setTo(0);
+
+                //show team on screen
                 editedPlayer._lobbyViewTeam = game.add.text(xOfTeam, positionY, editedPlayer.team, thisFontStyle);
                 editedPlayer._lobbyViewTeam.anchor.setTo(0);
+
+                //show readiness on screen
+                editedPlayer._lobbyViewReadiness = game.add.text(xOfReady, positionY, stringReady, readyStyle);
+                editedPlayer._lobbyViewReadiness.anchor.setTo(0);
+
                 console.log('state-lobby: A new player was added to the list:', editedPlayer);
             }
         }
@@ -146,7 +164,9 @@ var lobbyState = {
     },
 
     /**
-     * Sets the team to the given ID
+     * Sets the team to the given team
+     *
+     * Also updates the list viewed to the user
      * @param newTeam the new Team to set to
      * @throws Error if the newTeam is out of bounds
      */
