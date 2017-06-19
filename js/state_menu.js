@@ -46,7 +46,7 @@ var menuState = {
     },
 
     start: function () {
-        //Go to the play state
+        //Go to the lobby state
         game.state.start('lobby');
         //TODO create Game
     },
