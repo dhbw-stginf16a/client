@@ -4,6 +4,9 @@
 var bootState = {
 
     preload: function () {
+        //Add Phaser Input plugin
+        game.add.plugin(PhaserInput.Plugin);
+
         //Load the Image
         game.load.image('progressBar', 'assets/progressBar.png');
 
