@@ -2,15 +2,22 @@
  * Created by andreas on 11.06.17.
  */
 
+//--------- Global Vars for the PlayState
 var tween = null;
 var popup;
 var button;
+//--------- Global Vars for the Popup Window
 //Time available for answering the questions (in seconds)
 const time = 60;
+//progressBar object
 var progressBar;
+//Value between 0 and 1
 var progress;
+//Time when the Question Windows was opened
 var startTime;
+//Position of the Elements
 var ph, pw;
+//Stores if the question popup is open or not
 var running;
 
 var playState = {
@@ -35,7 +42,7 @@ var playState = {
             progress = (timeNow - startTime) / (time * 1000);
             console.log("progress: " + progress);
 
-            if(progress > 1){
+            if(progress >= 1){
                 //When Time is over raise Event
                 running = false;
                 this.onTimeOver();
