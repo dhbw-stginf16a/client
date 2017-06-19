@@ -16,6 +16,9 @@ var loadState = {
 
         // Load all our assets
         game.load.spritesheet('button', 'assets/button.png', 120, 40);
+        game.load.spritesheet('change_team', 'assets/change_team.png', 100, 40);
+        game.load.spritesheet('start_game', 'assets/start_game.png', 100, 40);
+        game.load.spritesheet('copy', 'assets/copy.png', 100, 40);
         game.load.image('background', 'assets/background.png');
     },
     create: function () {
