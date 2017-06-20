@@ -4,6 +4,23 @@
 // Initialise Phaser
 var game = new Phaser.Game(1920, 1080, Phaser.AUTO, null);
 
+//Global vars
+game.global = {
+
+    //Colors
+    /*Grau: R51 G51 B51
+     Cyan: R41 G171 B226
+     Weiß: R242 G242 B242
+     Orange: R247 G147 B30*/
+    colors: {
+        grau: '#333333',
+        cyan: '#29abe2',
+        weiss: '#f2f2f2',
+        orange: '#f7931e'
+    }
+
+};
+
 //split url to get GET parameters
 const $_GET = {};
 const args = location.search.substr(1).split(/&/);
