@@ -6,6 +6,10 @@
 var tween = null;
 var popup;
 var button;
+//--------- Global Vars for the Playfield
+var player;
+var playerField;
+var positions = [1,2];
 //--------- Global Vars for the Popup Window
 //Time available for answering the questions (in seconds)
 const time = 60;
@@ -26,21 +30,35 @@ var playState = {
     },
 
     create: function () {
+
         //Show Name of the screen
         var nameLabel = game.add.text(game.world.centerX, 80, 'Brettprojekt Play State', { font: '50px Arial', fill: '#ffffff' });
         nameLabel.anchor.setTo(0.5, 0.5);
 
+        //load Playfield
+        this.loadPF();
+
+
         //init popup window for the questions
         this.initPopup();
+
+
+        //load Player
+        this.loadPlayer();
+
+
     },
 
     update: function () {
+
+
+
         if(running){
             var d = new Date;
             var timeNow = d.getTime();
 
             progress = (timeNow - startTime) / (time * 1000);
-            console.log("progress: " + progress);
+            //console.log("progress: " + progress);
 
             if(progress >= 1){
                 //When Time is over raise Event
@@ -58,6 +76,145 @@ var playState = {
             }
         }
     },
+
+    loadPF: function () {
+
+
+
+        var xpos = 0;
+        var ypos = 0;
+        var lastXpos = 0;
+        var lastYpos = 0;
+        var offsetX = 0;  //x position of playfield with 0 = middle of screen (+ = right, - = left)
+        var offsetY = -180; //y position of playfield with 0 = middle of screen (+ = up, - = down)
+
+
+        var pRadius = 20;
+
+
+        var square = game.add.graphics(offsetX + 580, -offsetY+70);
+        square.anchor.set(0.5);
+        square.beginFill(0x333333,1);
+        square.drawRect(0,0,800,800);
+
+        var graphics = game.add.graphics(0,0);
+
+        for(var i=0; i<85;i++){
+            positions[i] = {x: game.world.centerX+xpos+offsetX, y:game.world.centerY+ypos-offsetY};
+            if(i%7 === 0){ //draws special fields (currently every 7th field is special)
+                graphics.anchor.set(0.5);
+                graphics.beginFill(0x33abe2, 1);
+                graphics.lineStyle(2,0xF2F2F2,1);
+                graphics.drawRect(game.world.centerX+xpos+offsetX-pRadius/2,game.world.centerY+ypos-offsetY-pRadius/2,pRadius,pRadius);
+
+            }else {     //draws normal fields
+                graphics.anchor.set(0.5);
+                graphics.beginFill(0xf7931e, 1);
+                graphics.lineStyle(2, 0xF2F2F2, 1);
+                graphics.drawCircle(game.world.centerX + xpos + offsetX, game.world.centerY + ypos - offsetY, pRadius);
+            }
+
+
+            if (i<2){
+                graphics.moveTo(game.world.centerX+xpos+offsetX,game.world.centerY+ypos-offsetY+pRadius/2);
+                ypos = ypos+60;
+                graphics.lineTo(game.world.centerX+xpos+offsetX,game.world.centerY+ypos-offsetY-pRadius/2);
+            }
+            if (i>=2 && i<5){
+                graphics.moveTo(game.world.centerX+xpos+offsetX+pRadius/2,game.world.centerY+ypos-offsetY);
+                xpos = xpos+60;
+                graphics.lineTo(game.world.centerX+xpos+offsetX-pRadius/2,game.world.centerY+ypos-offsetY);
+            }
+            if (i>=5 && i<11){
+                graphics.moveTo(game.world.centerX+xpos+offsetX,game.world.centerY+ypos-offsetY-pRadius/2);
+                ypos = ypos-60;
+                graphics.lineTo(game.world.centerX+xpos+offsetX,game.world.centerY+ypos-offsetY+pRadius/2);
+            }
+            if (i>=11 && i<17){
+                graphics.moveTo(game.world.centerX+xpos+offsetX-pRadius/2,game.world.centerY+ypos-offsetY);
+                xpos = xpos-60;
+                graphics.lineTo(game.world.centerX+xpos+offsetX+pRadius/2,game.world.centerY+ypos-offsetY);
+            }
+            if (i>=17 && i<24){
+                graphics.moveTo(game.world.centerX+xpos+offsetX,game.world.centerY+ypos-offsetY+pRadius/2);
+                ypos = ypos+60;
+                graphics.lineTo(game.world.centerX+xpos+offsetX,game.world.centerY+ypos-offsetY-pRadius/2);
+            }
+            if (i>=24 && i<31){
+                graphics.moveTo(game.world.centerX+xpos+offsetX+pRadius/2,game.world.centerY+ypos-offsetY);
+                xpos = xpos+60;
+                graphics.lineTo(game.world.centerX+xpos+offsetX-pRadius/2,game.world.centerY+ypos-offsetY);
+            }
+            if (i>=31 && i<39){
+                graphics.moveTo(game.world.centerX+xpos+offsetX,game.world.centerY+ypos-offsetY-pRadius/2);
+                ypos = ypos-60;
+                graphics.lineTo(game.world.centerX+xpos+offsetX,game.world.centerY+ypos-offsetY+pRadius/2);
+            }
+            if (i>=39 && i<47){
+                graphics.moveTo(game.world.centerX+xpos+offsetX-pRadius/2,game.world.centerY+ypos-offsetY);
+                xpos = xpos-60;
+                graphics.lineTo(game.world.centerX+xpos+offsetX+pRadius/2,game.world.centerY+ypos-offsetY);
+            }
+            if (i>=47 && i<56){
+                graphics.moveTo(game.world.centerX+xpos+offsetX,game.world.centerY+ypos-offsetY+pRadius/2);
+                ypos = ypos+60;
+                graphics.lineTo(game.world.centerX+xpos+offsetX,game.world.centerY+ypos-offsetY-pRadius/2);
+            }
+            if (i>=56 && i<65){
+                graphics.moveTo(game.world.centerX+xpos+offsetX+pRadius/2,game.world.centerY+ypos-offsetY);
+                xpos = xpos+60;
+                graphics.lineTo(game.world.centerX+xpos+offsetX-pRadius/2,game.world.centerY+ypos-offsetY);
+            }
+            if (i>=65 && i<75){
+                graphics.moveTo(game.world.centerX+xpos+offsetX,game.world.centerY+ypos-offsetY-pRadius/2);
+                ypos = ypos-60;
+                graphics.lineTo(game.world.centerX+xpos+offsetX,game.world.centerY+ypos-offsetY+pRadius/2);
+            }
+            if (i>=75 && i<85){
+                graphics.moveTo(game.world.centerX+xpos+offsetX-pRadius/2,game.world.centerY+ypos-offsetY);
+                xpos = xpos-60;
+                if(i<84)
+                graphics.lineTo(game.world.centerX+xpos+offsetX+pRadius/2,game.world.centerY+ypos-offsetY);
+            }
+
+        }
+        graphics.anchor.set(0.5);
+        graphics.beginFill(0x000000, 1);
+        graphics.lineStyle(2,0xf2f2f2,1);
+        graphics.drawRect(game.world.centerX-140,game.world.centerY-20,280,220)
+        var style = { font: "90px Arial", fill: "#f2f2f2", wordWrap: true, wordWrapWidth: 260, align: "center"};
+
+        text = game.add.text(game.world.centerX, game.world.centerY+90, "GOAL", style);
+        text.anchor.set(0.5);
+    },
+
+    loadPlayer: function (){
+        player = game.add.graphics(0, 0);
+        // graphics.lineStyle(2, 0xffd900, 1);
+        player.anchor.set(0.5);
+        player.beginFill(0xFF0000, 1);
+        player.drawCircle(positions[84].x, positions[84].y, 20);
+        player.inputEnabled = true;
+        player.input.enableDrag();
+        playerField = 84;
+
+
+
+
+        //moving the Player when mouse is clicked
+        game.input.onDown.add(doSomething, this);
+        function doSomething() {
+            this.movePlayer(1);
+        }
+
+    },
+    
+    movePlayer: function (m) {
+        player.x = positions[playerField-m].x-positions[84].x;
+        player.y = positions[playerField-m].y-positions[84].y;
+        playerField = playerField-m;
+    },
+
 
     openPopup: function () {
         console.log("open popup");
@@ -98,7 +255,7 @@ var playState = {
 
     initPopup: function () {
         //Add Start Button
-        var startButton = game.add.button(game.world.width*0.5, game.world.height*0.5, 'button', this.openPopup, this, 1, 0, 2);
+        var startButton = game.add.button(game.world.width*0.9, game.world.height*0.5, 'button', this.openPopup, this, 1, 0, 2);
         startButton.anchor.set(0.5);
 
         //  You can drag the pop-up window around
