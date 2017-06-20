@@ -10,6 +10,11 @@ var button;
 var player;
 var playerField;
 var positions = [1,2];
+//--------- Global Vars for Left Panel
+var points;
+var players=[1,2];
+
+
 //--------- Global Vars for the Popup Window
 //Time available for answering the questions (in seconds)
 const time = 60;
@@ -31,14 +36,24 @@ var playState = {
 
     create: function () {
 
+
+        players[0]={name:"Testnickname1",teampoints: 63,team: 1};
+        players[1]={name:"Testnickname2",teampoints: 24,team: 2};
+        players[2]={name:"Testnickname3",teampoints: 12,team: 3};
+        players[3]={name:"Testnickname4",teampoints: 24,team: 2};
+
+
+
         //Show Name of the screen
         var nameLabel = game.add.text(game.world.centerX, 80, 'Brettprojekt Play State', { font: '50px Arial', fill: '#ffffff' });
         nameLabel.anchor.setTo(0.5, 0.5);
 
         //load Playfield
         this.loadPF();
-
-
+        //load left Panel
+        this.loadLP();
+        //load right Panel
+        this.loadRP();
         //init popup window for the questions
         this.initPopup();
 
@@ -77,23 +92,68 @@ var playState = {
         }
     },
 
+
+    loadLP: function () {
+        var posx = 20;
+        var posy = 20;
+
+        //frame
+        var controllRECT = game.add.graphics(0, 0);
+        controllRECT.lineStyle(2,0xF2F2F2,1);
+        controllRECT.beginFill(0x333333,1);
+        controllRECT.drawRect(posx,posy,530,1040);
+        
+        //points
+        var pointsStyle = { font: "30px Arial", fill: "#f2f2f2", wordWrap: true, wordWrapWidth: 260, align: "center"};
+        var smallStyle = { font: "20px Arial", fill: "#f2f2f2", wordWrap: true, wordWrapWidth: 260, align: "center"};
+        game.add.text(posx + 20, posy + 20, "POINTS:", pointsStyle);
+        points = game.add.text(posx + 170, posy + 20, "###", pointsStyle);
+
+        var graphics = game.add.graphics(0,0);
+        graphics.lineStyle(2, 0xF2F2F2, 1);
+
+
+        //Players
+        graphics.moveTo(posx,posy+90);
+        graphics.lineTo(posx+50,posy+90);
+        game.add.text(posx+55,posy+75, "Players", smallStyle);
+        graphics.moveTo(posx+130,posy+90);
+        graphics.lineTo(posx+530,posy+90);
+
+        game.add.text(posx+55,posy+100+10, "Nickname", pointsStyle);
+        game.add.text(posx+55+250,posy+100+10, "Team", pointsStyle);
+        game.add.text(posx+55+250+100,posy+100+10, "Points", pointsStyle);
+
+        for(var i = 0; i < players.length;i++){
+            game.add.text(posx+55,posy+150+(i*50)+10, players[i].name, pointsStyle);
+            game.add.text(posx+55+250,posy+150+(i*50)+10, players[i].team, pointsStyle);
+            game.add.text(posx+55+250+100,posy+150+(i*50)+10, players[i].teampoints, pointsStyle);
+        }
+
+    },
+
+    loadRP: function () {
+        var cardRECT = game.add.graphics(0, 0)
+        cardRECT.lineStyle(2,0xF2F2F2,1);
+        cardRECT.beginFill(0x333333,1);
+        cardRECT.drawRect(1370,20,530,1040);
+
+    },
+
+
     loadPF: function () {
-
-
-
         var xpos = 0;
         var ypos = 0;
         var lastXpos = 0;
         var lastYpos = 0;
-        var offsetX = 0;  //x position of playfield with 0 = middle of screen (+ = right, - = left)
-        var offsetY = -180; //y position of playfield with 0 = middle of screen (+ = up, - = down)
-
+        var offsetX = -20;  //x position of playfield with 0 = middle of screen (+ = right, - = left)
+        var offsetY = -190; //y position of playfield with 0 = middle of screen (+ = up, - = down)
 
         var pRadius = 20;
 
-
         var square = game.add.graphics(offsetX + 580, -offsetY+70);
         square.anchor.set(0.5);
+        square.lineStyle(2,0xF2F2F2,1);
         square.beginFill(0x333333,1);
         square.drawRect(0,0,800,800);
 
@@ -107,7 +167,7 @@ var playState = {
                 graphics.lineStyle(2,0xF2F2F2,1);
                 graphics.drawRect(game.world.centerX+xpos+offsetX-pRadius/2,game.world.centerY+ypos-offsetY-pRadius/2,pRadius,pRadius);
 
-            }else {     //draws normal fields
+            }else{     //draws normal fields
                 graphics.anchor.set(0.5);
                 graphics.beginFill(0xf7931e, 1);
                 graphics.lineStyle(2, 0xF2F2F2, 1);
@@ -181,16 +241,14 @@ var playState = {
         graphics.anchor.set(0.5);
         graphics.beginFill(0x000000, 1);
         graphics.lineStyle(2,0xf2f2f2,1);
-        graphics.drawRect(game.world.centerX-140,game.world.centerY-20,280,220)
+        graphics.drawRect(game.world.centerX-140+offsetX,game.world.centerY-20,280,220)
         var style = { font: "90px Arial", fill: "#f2f2f2", wordWrap: true, wordWrapWidth: 260, align: "center"};
-
-        text = game.add.text(game.world.centerX, game.world.centerY+90, "GOAL", style);
+        text = game.add.text(game.world.centerX+offsetX, game.world.centerY+90, "GOAL", style);
         text.anchor.set(0.5);
     },
 
     loadPlayer: function (){
         player = game.add.graphics(0, 0);
-        // graphics.lineStyle(2, 0xffd900, 1);
         player.anchor.set(0.5);
         player.beginFill(0xFF0000, 1);
         player.drawCircle(positions[84].x, positions[84].y, 20);
@@ -282,7 +340,7 @@ var playState = {
         ph = (popup.height / 2) - 50;
 
         var question = game.make.sprite(-pw, -ph, 'question');
-        var text_question = game.make.text(5, 20, 'How much is the fish?', { font: '50px Arial', fill: '#ffffff' });
+        var text_question = game.make.text(5, 20, 'How much is the fish?', { font: '50px Arial', fill: '#f2f2f2' });
         question.addChild(text_question);
 
         //Position the answer left field
@@ -290,7 +348,7 @@ var playState = {
         ph = (popup.height / 2) - 200;
 
         var answer_left = game.make.button(-pw, -ph, 'answer_left', this.onWrongAnswerClicked, this, 1, 0, 2);
-        var text_left = game.make.text(5, 20, 'a', { font: '50px Arial', fill: '#ffffff' });
+        var text_left = game.make.text(5, 20, 'a', { font: '50px Arial', fill: '#f2f2f2' });
         answer_left.addChild(text_left);
 
         answer_left.inputEnabled = true;
@@ -300,21 +358,21 @@ var playState = {
         ph = (popup.height / 2) - 350;
 
         var answer_left2 = game.make.button(-pw, -ph, 'answer_left', this.onRightAnswerClicked, this, 1, 0, 2);
-        var text_left2 = game.make.text(5, 20, 'c', { font: '50px Arial', fill: '#ffffff' });
+        var text_left2 = game.make.text(5, 20, 'c', { font: '50px Arial', fill: '#f2f2f2' });
         answer_left2.addChild(text_left2);
 
         pw = (popup.width / 2) - 410;
         ph = (popup.height / 2) - 200;
 
         var answer_right = game.make.button(-pw, -ph, 'answer_right', this.onWrongAnswerClicked, this, 1, 0, 2);
-        var text_right = game.make.text(60, 20, 'b', { font: '50px Arial', fill: '#ffffff' });
+        var text_right = game.make.text(60, 20, 'b', { font: '50px Arial', fill: '#f2f2f2' });
         answer_right.addChild(text_right);
 
         pw = (popup.width / 2) - 410;
         ph = (popup.height / 2) - 350;
 
         var answer_right2 = game.make.button(-pw, -ph, 'answer_right', this.onWrongAnswerClicked, this, 1, 0, 2);
-        var text_right2 = game.make.text(60, 20, 'd', { font: '50px Arial', fill: '#ffffff' });
+        var text_right2 = game.make.text(60, 20, 'd', { font: '50px Arial', fill: '#f2f2f2' });
         answer_right2.addChild(text_right2);
 
 

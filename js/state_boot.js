@@ -21,7 +21,7 @@ var bootState = {
         game.scale.forceLandscape = true;
     },
     create: function () {
-        game.stage.backgroundColor = '#3498db';
+        game.stage.backgroundColor = '#333333';
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
         //Start the load state
