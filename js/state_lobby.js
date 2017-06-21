@@ -107,7 +107,7 @@ var lobbyState = {
 
         for(const editedPlayerID in editPlayers){
             const editedPlayer = editPlayers[editedPlayerID];
-            let found = null;
+            var found = null;
             for(const oldPlayerID in this._players){
                 const oldPlayer = this._players[oldPlayerID];
                 if(oldPlayer.id === editedPlayer.id){
@@ -185,7 +185,7 @@ var lobbyState = {
     create: function () {
         console.log('state_lobby: create was called');
         if(this._initializeCorrect !== true){
-            let nameLabel;
+            var nameLabel;
 
             nameLabel = game.add.text(game.world.centerX, 80, 'Error Please try again', { font: '50px Arial', fill: '#ffffff' });
             nameLabel.anchor.setTo(0.5, 0.5);

@@ -6,14 +6,17 @@ var menuState = {
         // Add a background image
         // game.add.image(0, 0, 'background');
         // Display the name of the game
-        let nameLabel = game.add.text(game.world.centerX, 80, 'Brettprojekt Menu', { font: '50px Arial', fill: '#ffffff' });
+        var nameLabel = game.add.text(game.world.centerX, 80, 'Brettprojekt Menu', {
+            font: '50px Arial',
+            fill: '#ffffff'
+        });
         nameLabel.anchor.setTo(0.5, 0.5);
 
         //Add Start Button
-        let startButton = game.add.button(game.world.centerX, game.world.centerY, 'button', this.start, this, 1, 0, 2);
+        var startButton = game.add.button(game.world.centerX, game.world.centerY, 'button', this.start, this, 1, 0, 2);
         startButton.anchor.set(0);
 
-        let startWithGameCode = game.add.button(game.world.centerX, game.world.centerY + 100, 'button', this.startFromCode, this, 1, 0, 2);
+        var startWithGameCode = game.add.button(game.world.centerX, game.world.centerY + 100, 'button', this.startFromCode, this, 1, 0, 2);
         startWithGameCode.anchor.set(0);
 
         this._inputPlayerName = game.add.inputField(game.world.centerX - 200, game.world.centerY, {
@@ -60,7 +63,7 @@ var menuState = {
             const gameCode = this._inputGameCode.text.text;
             console.log('state-menu: value of gameCode', gameCode);
             if(gameCode !== null && gameCode !== undefined && gameCode !== ''){
-                let newQuerry = '?';
+                var newQuerry = '?';
                 for(const id in $_GET){
                     if(id !== 'joinGame'){
                         newQuerry += id + '=' + $_GET[id] + '&';
@@ -68,7 +71,10 @@ var menuState = {
                 }
                 newQuerry+='joinGame='+gameCode;
 
-                let newUrl = location.href.replace(location.search, newQuerry);
+                var newUrl = location.href.replace(location.search, newQuerry);
+                if (location.search == "") {
+                    newUrl = location.href + newQuerry;
+                }
 
                 window.history.pushState({}, gameCode, newUrl);
                 game.state.start('lobby', true, false, gameCode, playerName, true);
