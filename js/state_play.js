@@ -10,7 +10,6 @@ var button;
 const amountOfPositions = 84;
 var positions = [1,2];
 //--------- Global Vars for Left Panel
-var points;
 
 
 //--------- Global Vars for the Popup Window
@@ -27,11 +26,43 @@ var ph, pw;
 //Stores if the question popup is open or not
 var running;
 
+/**
+ * Converts the given string to a number assuming it is a string of form #XXXXXX
+ * where X = [0-9A-Fa-f]
+ * @param stringToConvert
+ */
+function convertHexcodeToDecimal(stringToConvert) {
+    stringToConvert = stringToConvert.toUpperCase();
+    var newNumber = 0;
+    for (var i = 1; i <= 6; i++) {
+        const char = stringToConvert.charAt(i);
+        newNumber = (newNumber << 4);
+        if (char >= '0' && char <= '9') {
+            newNumber += (char - 0);
+        } else if (char === 'A') {
+            newNumber += 10;
+        } else if (char === 'B') {
+            newNumber += 11;
+        } else if (char === 'C') {
+            newNumber += 12;
+        } else if (char === 'D') {
+            newNumber += 13;
+        } else if (char === 'E') {
+            newNumber += 14;
+        } else if (char === 'F') {
+            newNumber += 15;
+        }
+    }
+    return newNumber;
+}
+
 var playState = {
     /*
      this._players stores a array of players of the form {team, id, team, ready}
      this._teamMarkers stores a array of the teamMarkers they contain the field ._position stating there current position on the playfield
      this._positionsPlayingField stores the field of the Playfield in reversed order
+
+     this._pointsDisplay The big points display of the
      */
 
     preload: function () {
@@ -60,15 +91,15 @@ var playState = {
 
         //load Playfield
         this.loadPF();
+        //load Playermarkers
+        this.loadTeammarkes(this._players);
+
         //load left Panel
         this.loadLP();
         //load right Panel
         this.loadRP();
         //init popup window for the questions
         this.initPopup();
-
-        //load Playermarkers
-        this.loadTeammarkes(this._players);
     },
 
     create: function () {
@@ -103,9 +134,26 @@ var playState = {
         }
     },
 
+    /**
+     * Loads the left Panel and draws all stuff needed for it
+     */
     loadLP: function () {
-        var posx = 20;
-        var posy = 20;
+        const pointsStyle = {
+            font: "30px Arial",
+            fill: game.global.colors.weiss,
+            wordWrap: true,
+            wordWrapWidth: 260,
+            align: "center"
+        };
+        const smallStyle = {
+            font: "20px Arial",
+            fill: game.global.colors.weiss,
+            wordWrap: true,
+            wordWrapWidth: 260,
+            align: "center"
+        };
+        const posx = 20;
+        const posy = 20;
 
         //frame
         var controllRECT = game.add.graphics(0, 0);
@@ -114,30 +162,39 @@ var playState = {
         controllRECT.drawRect(posx,posy,530,1040);
         
         //points
-        var pointsStyle = { font: "30px Arial", fill: "#f2f2f2", wordWrap: true, wordWrapWidth: 260, align: "center"};
-        var smallStyle = { font: "20px Arial", fill: "#f2f2f2", wordWrap: true, wordWrapWidth: 260, align: "center"};
         game.add.text(posx + 20, posy + 20, "POINTS:", pointsStyle);
-        points = game.add.text(posx + 170, posy + 20, "###", pointsStyle);
 
         var graphics = game.add.graphics(0,0);
         graphics.lineStyle(2, 0xF2F2F2, 1);
 
 
         //Players
+        const nicknamePosX = posx + 55;
+        const teamPosX = nicknamePosX + 250;
+        const pointsPosX = teamPosX + 100;
+        const offsetPlayerY = posy + 160;
+        const offsetHeadingY = posy + 100 + 10;
+        const distanceToNewPlayer = 50;
+
         graphics.moveTo(posx,posy+90);
         graphics.lineTo(posx+50,posy+90);
         game.add.text(posx+55,posy+75, "Players", smallStyle);
         graphics.moveTo(posx+130,posy+90);
         graphics.lineTo(posx+530,posy+90);
 
-        game.add.text(posx+55,posy+100+10, "Nickname", pointsStyle);
-        game.add.text(posx+55+250,posy+100+10, "Team", pointsStyle);
-        game.add.text(posx+55+250+100,posy+100+10, "Points", pointsStyle);
+        game.add.text(nicknamePosX, offsetHeadingY, "Nickname", pointsStyle);
+        game.add.text(teamPosX, offsetHeadingY, "Team", pointsStyle);
+        game.add.text(pointsPosX, offsetHeadingY, "Points", pointsStyle);
 
-        for (var i = 0; i < this._players[i]; i++) {
-            game.add.text(posx + 55, posy + 150 + (i * 50) + 10, this._players[i].name, pointsStyle);
-            game.add.text(posx + 55 + 250, posy + 150 + (i * 50) + 10, this._players[i].team, pointsStyle);
-            game.add.text(posx + 55 + 250 + 100, posy + 150 + (i * 50) + 10, amountOfPositions - this._teamMarkers[this._players[i].team]._position, pointsStyle);
+        //Points of the players team
+        pointsStyle.fill = game.global.teamColors[this._players[0].team]; //TODO maybe search properly for the player
+        this._pointsDisp = game.add.text(posx + 170, posy + 20, "0", pointsStyle);
+
+        for (var i = 0; i < this._players.length; i++) {
+            pointsStyle.fill = game.global.teamColors[this._players[i].team];
+            this._players[i]._nameDisplay = game.add.text(nicknamePosX, offsetPlayerY + (i * distanceToNewPlayer), this._players[i].name, pointsStyle);
+            this._players[i]._teamDisplay = game.add.text(teamPosX, offsetPlayerY + (i * distanceToNewPlayer), this._players[i].team, pointsStyle);
+            this._players[i]._scoreDisplay = game.add.text(pointsPosX, offsetPlayerY + (i * distanceToNewPlayer), amountOfPositions - this._teamMarkers[this._players[i].team]._position, pointsStyle);
         }
 
     },
@@ -149,7 +206,6 @@ var playState = {
         cardRECT.drawRect(1370,20,530,1040);
 
     },
-
 
     loadPF: function () {
         var xpos = 0;
@@ -269,7 +325,7 @@ var playState = {
                 const team = player.team;
                 if (this._teamMarkers[team] == undefined) {
                     this._teamMarkers[team] = game.add.graphics(0, 0);
-                    this._teamMarkers[team].beginFill(0xFFF000 >> (team - 1), 1);
+                    this._teamMarkers[team].beginFill(convertHexcodeToDecimal(game.global.teamColors[team]), 1);
                     this._teamMarkers[team].drawCircle(positions[84].x, positions[84].y, 20);
                     this._teamMarkers[team].inputEnabled = true;
                     this._teamMarkers[team].input.enableDrag();
@@ -283,7 +339,8 @@ var playState = {
         //moving the Player when mouse is clicked
         game.input.onDown.add(doSomething, this);
         function doSomething() {
-            this.movePlayer(1, 1);
+            this.moveTeam(1, 1);
+            this.updateScores();
         }
 
     },
@@ -293,7 +350,7 @@ var playState = {
      * @param team the teamID to move (starts at 1)
      * @param amount the amount of score to alter
      */
-    movePlayer: function (team, amount) {
+    moveTeam: function (team, amount) {
         var playerMarker = this._teamMarkers[team];
         //console.log('play-state: movePlayer', playerMarker, amount);
         playerMarker.x = positions[playerMarker._position - amount].x - positions[84].x;
@@ -306,12 +363,22 @@ var playState = {
      * @param team the teamID to move (starts at 1)
      * @param score the score to set to
      */
-    setPlayer: function (team, score) {
+    setTeam: function (team, score) {
         var playerMarker = this._teamMarkers[team];
         //console.log('play-state: movePlayer', playerMarker, amount);
         playerMarker.x = positions[amountOfPositions - score].x - positions[84].x;
         playerMarker.y = positions[amountOfPositions - score].y - positions[84].y;
         playerMarker._position = amountOfPositions - score;
+    },
+
+    /**
+     * updates the Scores on the RP to the new values
+     */
+    updateScores: function () {
+        this._pointsDisp.text = amountOfPositions - this._teamMarkers[this._players[0].team]._position;//TODO maybe look properly for the player
+        for (var i = 0; i < this._players.length; i++) {
+            this._players[i]._scoreDisplay.text = amountOfPositions - this._teamMarkers[this._players[i].team]._position;
+        }
     },
 
     openPopup: function () {

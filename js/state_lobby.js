@@ -97,13 +97,6 @@ var lobbyState = {
         const xOfReady = 525;
         const thisFontStyle = { font: 'bold 18px Arial'};
         const readyStyle = {font: 'bold 18px Arial'};
-        const colors = {
-            1:'#F00',
-            2:'#0F0',
-            3:'#F0F',
-            4:'#FF0',
-            5:'#00F', 6:'#0FF', 7:'#500', 8:'#050', 9:'#505', 10:'#550', 11:'#005', 12:'#055'};
-        const colorReady = {true: '#0F0', false: '#F00'};
 
         for(const editedPlayerID in editPlayers){
             const editedPlayer = editPlayers[editedPlayerID];
@@ -119,8 +112,8 @@ var lobbyState = {
                 }
             }
 
-            thisFontStyle.fill = colors[editedPlayer.team];
-            readyStyle.fill = colorReady[editedPlayer.ready];
+            thisFontStyle.fill = game.global.teamColors[editedPlayer.team];
+            readyStyle.fill = game.global.colorReady[editedPlayer.ready];
             const stringReady = editedPlayer.ready ? 'ready' : 'unready';
 
             if(found !== null){

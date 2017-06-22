@@ -19,7 +19,22 @@ game.global = {
         orange: '#f7931e'
     },
 
-    playerCount: 2
+    colorReady: {true: '#00FF00', false: '#FF0000'},
+
+    teamColors: {
+        1: '#FF0000',
+        2: '#00FF00',
+        3: '#FF00FF',
+        4: '#FFFF00',
+        5: '#0000FF',
+        6: '#00FFFF',
+        7: '#550000',
+        8: '#005500',
+        9: '#550055',
+        100: '#555500',
+        11: '#000055',
+        12: '#005555'
+    }
 };
 
 //split url to get GET parameters
