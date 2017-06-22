@@ -17,8 +17,9 @@ game.global = {
         cyan: '#29abe2',
         weiss: '#f2f2f2',
         orange: '#f7931e'
-    }
+    },
 
+    playerCount: 2
 };
 
 //split url to get GET parameters

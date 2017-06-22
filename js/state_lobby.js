@@ -54,9 +54,9 @@ var lobbyState = {
             this._changeTeamButton.anchor.setTo(0, 0);
 
             //startGame button TODO only show for gameLeader
-            this._startGameButton = game.add.button(100, game.world.height - 100, 'change_team', this.startGame, this, 1, 0, 2);
-            this._startGameButton.anchor.setTo(0, 0);
-            this._startGameButton.visible = false;
+            this._startGameButton = game.add.button(game.world.width - 100, game.world.height - 100, 'start_game', this.startGame, this, 1, 0, 2);
+            this._startGameButton.anchor.setTo(1, 0);
+            this._startGameButton.visible = true; //TODO change back to false
 
             //copy gameCode
             this._CopyButton = game.add.button(game.world.width, 0, 'copy', function () {copyToClipboard(this._gameCode);}, this, 1, 0, 2);
@@ -196,7 +196,17 @@ var lobbyState = {
     update: function () {},
 
     startGame: function () {
-        //TODO
-        game.state.start('play');
+        const newPlayer = [];
+        for (const i in this._players) {
+            if (this._players[i] != null) {
+                newPlayer.push({
+                    name: this._players[i].name,
+                    team: this._players[i].team,
+                    id: this._players[i].id,
+                    ready: false
+                });
+            }
+        }
+        game.state.start('play', true, false, newPlayer);
     }
 };
