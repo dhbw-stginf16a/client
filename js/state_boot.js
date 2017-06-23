@@ -1,7 +1,16 @@
 /**
  * Created by andreas on 11.06.17.
  */
-var bootState = {
+//see https://github.com/orange-games/phaser-input/issues/7
+const PhaserInput = require('phaser-input').PhaserInput;
+
+let game;
+
+module.exports = {
+
+    init: function (gameState) {
+        game = gameState;
+    },
 
     preload: function () {
         //Add Phaser Input plugin
@@ -25,7 +34,7 @@ var bootState = {
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
         //Start the load state
-        game.state.start('load');
+        game.state.start('load', true, false, game);
     }
 
 };

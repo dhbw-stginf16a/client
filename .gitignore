@@ -1,2 +1,4 @@
 #Ignore Files
 .idea/
+node_modules/
+build/

@@ -1,6 +1,7 @@
 /**
  * Created by andreas on 11.06.17.
  */
+let game;
 
 //--------- Global Vars for the PlayState
 var tween = null;
@@ -29,9 +30,13 @@ var ph, pw;
 //Stores if the question popup is open or not
 var running;
 
-var playState = {
+module.exports = {
     preload: function () {
 
+    },
+
+    init: function (gameState) {
+        game = gameState
     },
 
     create: function () {

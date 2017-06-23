@@ -1,22 +1,25 @@
 /**
  * Created by andreas on 11.06.17.
  */
-var menuState = {
+
+let game;
+
+module.exports = {
     create: function () {
         // Add a background image
         // game.add.image(0, 0, 'background');
         // Display the name of the game
-        var nameLabel = game.add.text(game.world.centerX, 80, 'Brettprojekt Menu', {
+        let nameLabel = game.add.text(game.world.centerX, 80, 'Brettprojekt Menu', {
             font: '50px Arial',
             fill: '#ffffff'
         });
         nameLabel.anchor.setTo(0.5, 0.5);
 
         //Add Start Button
-        var startButton = game.add.button(game.world.centerX, game.world.centerY, 'button', this.start, this, 1, 0, 2);
+        let startButton = game.add.button(game.world.centerX, game.world.centerY, 'button', this.start, this, 1, 0, 2);
         startButton.anchor.set(0);
 
-        var startWithGameCode = game.add.button(game.world.centerX, game.world.centerY + 100, 'button', this.startFromCode, this, 1, 0, 2);
+        let startWithGameCode = game.add.button(game.world.centerX, game.world.centerY + 100, 'button', this.startFromCode, this, 1, 0, 2);
         startWithGameCode.anchor.set(0);
 
         this._inputPlayerName = game.add.inputField(game.world.centerX - 200, game.world.centerY, {
@@ -34,7 +37,8 @@ var menuState = {
         this._inputPlayerName.focusOutOnEnter = false;
     },
 
-    init: function () {
+    init: function (gameState) {
+        game = gameState;
         this._inputGameCode = game.add.inputField(game.world.centerX - 200, game.world.centerY + 100, {
             font: '18px Arial',
             fill: '#000',
@@ -77,7 +81,7 @@ var menuState = {
                 }
 
                 window.history.pushState({}, gameCode, newUrl);
-                game.state.start('lobby', true, false, gameCode, playerName, true);
+                game.state.start('lobby', true, false, game, gameCode, playerName, true);
             }
         }
     }
