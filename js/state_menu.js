@@ -29,6 +29,7 @@ var menuState = {
             borderRadius: 5,
             placeHolder: 'Name'
         });
+        this._inputPlayerName.setText($_GET['name']);
 
         this._inputGameCode.focusOutOnEnter = false;
         this._inputPlayerName.focusOutOnEnter = false;
