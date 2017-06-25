@@ -1,16 +1,22 @@
 /**
  * Created by andreas on 11.06.17.
  */
+let game;
 
-var loadState = {
+module.exports = {
+
+    init: function (gameState) {
+        game = gameState;
+    },
+
     preload: function () {
         // Add a 'loading...' label on the screen
-        var loadingLabel = game.add.text(game.world.centerX, 150, 'loading...',
+        let loadingLabel = game.add.text(game.world.centerX, 150, 'loading...',
             { font: '30px Arial', fill: '#ffffff' });
         loadingLabel.anchor.setTo(0.5, 0.5);
 
         // Display the progress bar
-        var progressBar = game.add.sprite(game.world.centerX, 200, 'progressBar');
+        let progressBar = game.add.sprite(game.world.centerX, 200, 'progressBar');
         progressBar.anchor.setTo(0.5, 0.5);
         game.load.setPreloadSprite(progressBar);
 
@@ -29,6 +35,6 @@ var loadState = {
     },
     create: function () {
         //Start the menu state
-        game.state.start('menu');
+        game.state.start('menu', true, false, game);
     }
 };

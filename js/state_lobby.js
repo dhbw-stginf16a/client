@@ -6,6 +6,8 @@ TODO diplay game ID maybe in a (readOnly) TextField
     maybe also a copy to clipboard button
  */
 
+let game;
+
 /**
  * Displays a prompt to copy the gameId from
  * @param text
@@ -14,18 +16,20 @@ function copyToClipboard(text) {
     window.prompt("Copy to clipboard: Ctrl+C, Enter", text); //TODO add MAC support
 }
 
-var lobbyState = {
+module.exports = {
     _maxTeams: 4,
 
     preload: function () {},
 
     /**
      * Initializes the state lobby
+     * @param gameState the gameObject
      * @param gameCode the gameCode of this game
      * @param playerName the playersName
      * @param isLeader true if this player is the leader of the game
      */
-    init: function (gameCode, playerName, isLeader) {
+    init: function (gameState, gameCode, playerName, isLeader) {
+        game = gameState;
         /*import {Socket} from "phoenix";
 
         socketStateLobby = new Socket("ws://localhost:4000/socket", {params: {token: window.userToken}});*/
@@ -197,6 +201,6 @@ var lobbyState = {
 
     startGame: function () {
         //TODO
-        game.state.start('play');
+        game.state.start('play', true, false, game);
     }
 };
