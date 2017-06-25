@@ -58,9 +58,9 @@ module.exports = {
             this._changeTeamButton.anchor.setTo(0, 0);
 
             //startGame button TODO only show for gameLeader
-            this._startGameButton = game.add.button(100, game.world.height - 100, 'change_team', this.startGame, this, 1, 0, 2);
-            this._startGameButton.anchor.setTo(0, 0);
-            this._startGameButton.visible = false;
+            this._startGameButton = game.add.button(game.world.width - 100, game.world.height - 100, 'start_game', this.startGame, this, 1, 0, 2);
+            this._startGameButton.anchor.setTo(1, 0);
+            this._startGameButton.visible = true; //TODO change back to false
 
             //copy gameCode
             this._CopyButton = game.add.button(game.world.width, 0, 'copy', function () {copyToClipboard(this._gameCode);}, this, 1, 0, 2);
@@ -101,13 +101,6 @@ module.exports = {
         const xOfReady = 525;
         const thisFontStyle = { font: 'bold 18px Arial'};
         const readyStyle = {font: 'bold 18px Arial'};
-        const colors = {
-            1:'#F00',
-            2:'#0F0',
-            3:'#F0F',
-            4:'#FF0',
-            5:'#00F', 6:'#0FF', 7:'#500', 8:'#050', 9:'#505', 10:'#550', 11:'#005', 12:'#055'};
-        const colorReady = {true: '#0F0', false: '#F00'};
 
         for(const editedPlayerID in editPlayers){
             const editedPlayer = editPlayers[editedPlayerID];
@@ -123,8 +116,8 @@ module.exports = {
                 }
             }
 
-            thisFontStyle.fill = colors[editedPlayer.team];
-            readyStyle.fill = colorReady[editedPlayer.ready];
+            thisFontStyle.fill = game.global.teamColors[editedPlayer.team];
+            readyStyle.fill = game.global.colorReady[editedPlayer.ready];
             const stringReady = editedPlayer.ready ? 'ready' : 'unready';
 
             if(found !== null){
@@ -200,7 +193,17 @@ module.exports = {
     update: function () {},
 
     startGame: function () {
-        //TODO
-        game.state.start('play', true, false, game);
+        const newPlayer = [];
+        for (const i in this._players) {
+            if (this._players[i] != null) {
+                newPlayer.push({
+                    name: this._players[i].name,
+                    team: this._players[i].team,
+                    id: this._players[i].id,
+                    ready: false
+                });
+            }
+        }
+        game.state.start('play', true, false, game, newPlayer);
     }
 };
