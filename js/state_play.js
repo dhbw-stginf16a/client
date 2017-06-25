@@ -76,9 +76,9 @@ module.exports = {
      * @param game The global game handle
      * @param players the Playerlist from the lobby-state
      */
-    init: function (game, players) {
+    init: function (gameState, players) {
         game = gameState;
-        console.log('state-play: init was called with: ', game, players);
+        console.log('state-play: init was called with: ', gameState, players);
         if (players === undefined) {
             throw new Error('State-lobby: The players received were undefined');
         }
@@ -311,7 +311,7 @@ module.exports = {
         graphics.lineStyle(2,0xf2f2f2,1);
         graphics.drawRect(game.world.centerX-140+offsetX,game.world.centerY-20,280,220)
         var style = { font: "90px Arial", fill: "#f2f2f2", wordWrap: true, wordWrapWidth: 260, align: "center"};
-        text = game.add.text(game.world.centerX+offsetX, game.world.centerY+90, "GOAL", style);
+        let text = game.add.text(game.world.centerX+offsetX, game.world.centerY+90, "GOAL", style);
         text.anchor.set(0.5);
     },
 

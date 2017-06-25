@@ -15,6 +15,7 @@ let menuState = require('./state_menu');
 let playState = require('./state_play');
 let lobbyState = require('./state_lobby');
 
+console.log('state-game all StateObjects:', bootState, loadState, menuState, playState, lobbyState);
 //Global vars
 game.global = {
 
