@@ -25,25 +25,26 @@ module.exports = {
      * Initializes the state lobby
      * @param gameState the gameObject
      * @param gameCode the gameCode of this game
-     * @param playerName the playersName
      * @param isLeader true if this player is the leader of the game
+     * @param joinGameResp the response of the websocket Request join_game
      */
-    init: function (gameState, gameCode, playerName, isLeader) {
+    init: function (gameState, gameCode, isLeader, joinGameResp) {
+        //TODO interpret joinGameResp
         game = gameState;
         /*import {Socket} from "phoenix";
 
         socketStateLobby = new Socket("ws://localhost:4000/socket", {params: {token: window.userToken}});*/
-        console.log('state_lobby: received: ', gameCode, playerName, isLeader);
-        if(gameCode === null || gameCode ===  undefined || playerName === undefined || playerName === null){ // this means that something went wrong in joining the game
-
+        console.log('state_lobby: received: ', gameCode, game.global.playerName, isLeader, joinGameResp);
+        if(gameCode === null || gameCode ===  undefined || game.global.playerName === undefined || game.global.playerName === null){ // this means that something went wrong in joining the game
+            console.error('invalid parameters');
         } else {
             this._players = [];
             this._gameCode = gameCode;
-            this._playerName = playerName;
+            this._playerName = game.global.playerName;
 
             //Add this player to be displayed first
             this.updatePlayers([{
-                name: playerName,
+                name: this._playerName,
                 id: 0/*TODO add right id here (This is in the response of join_game)*/,
                 team: 1,
                 ready: false
