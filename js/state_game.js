@@ -5,6 +5,7 @@
 //import 'pixi'
 //import 'p2'
 //import * as Phaser from './lib/phaser'
+import {Socket} from "phoenix-socket";
 
 // Initialise Phaser
 var game = new Phaser.Game(1920, 1080, Phaser.AUTO, null);
@@ -48,8 +49,21 @@ game.global = {
         12: '#005555'
     },
 
-    GET: {}
+    GET: {},
+
+    //Hold all channel object that should be hold over states
+    channel:{}
 };
+
+//Join the main Channel of the websocket and store a refference to both the socket and the channel in game.global
+game.global.websocket = new Socket("ws://brettprojekt.online:60123/socket",  {params: {token: undefined}});
+game.global.websocket.connect();
+
+game.global.channel.main = game.global.websocket.channel("main", {});
+
+game.global.channel.main.join()
+    .receive("ok", resp => { console.log("Joined successfully", resp) })
+    .receive("error", resp => { console.error("Unable to join", resp) });
 
 //split url to get GET parameters
 const args = location.search.substr(1).split(/&/);
