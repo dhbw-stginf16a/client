@@ -2,9 +2,9 @@
  * Created by andreas on 11.06.17.
  */
 
-import 'pixi'
-import 'p2'
-import Phaser from 'phaser'
+//import 'pixi'
+//import 'p2'
+//import * as Phaser from './lib/phaser'
 
 // Initialise Phaser
 var game = new Phaser.Game(1920, 1080, Phaser.AUTO, null);

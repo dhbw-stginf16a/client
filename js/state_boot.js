@@ -2,7 +2,7 @@
  * Created by andreas on 11.06.17.
  */
 //see https://github.com/orange-games/phaser-input/issues/7
-const PhaserInput = require('phaser-input').PhaserInput;
+//const PhaserInput = require('lib/phaser-input.min').PhaserInput;
 
 let game;
 

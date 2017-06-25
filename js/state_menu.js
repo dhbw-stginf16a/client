@@ -49,7 +49,7 @@ module.exports = {
             borderRadius: 5,
             placeHolder: 'GameId'
         });
-        this._inputGameCode.setText($_GET['joinGame']);
+        this._inputGameCode.setText(game.global.GET['joinGame']);
     },
 
     start: function () {
@@ -68,9 +68,9 @@ module.exports = {
             console.log('state-menu: value of gameCode', gameCode);
             if(gameCode !== null && gameCode !== undefined && gameCode !== ''){
                 var newQuerry = '?';
-                for(const id in $_GET){
+                for(const id in game.global.GET){
                     if(id !== 'joinGame'){
-                        newQuerry += id + '=' + $_GET[id] + '&';
+                        newQuerry += id + '=' + game.global.GET[id] + '&';
                     }
                 }
                 newQuerry+='joinGame='+gameCode;
