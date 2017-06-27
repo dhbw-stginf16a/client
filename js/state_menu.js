@@ -118,10 +118,10 @@ module.exports = {
         //Joining channel
         game.global.playerName = playerName;
 
-        window.history.pushState({}, gameID, newUrl);
         game.global.channel.main.push('join_game', {username: playerName, game_id: gameID})
             .receive('ok',
                 resp =>{
+                    window.history.pushState({}, gameID, newUrl);
                     game.state.start('lobby', true, false, game, gameID, leader, resp);
                 })
             .receive('error', console.error);

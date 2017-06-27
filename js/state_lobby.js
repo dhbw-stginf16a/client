@@ -2,7 +2,7 @@
  * Created by andreas on 13.06.17.
  */
 /*
-TODO diplay game ID maybe in a (readOnly) TextField
+ TODO add go ready button
     maybe also a copy to clipboard button
  */
 
@@ -31,24 +31,31 @@ module.exports = {
     init: function (gameState, gameCode, isLeader, joinGameResp) {
         //TODO interpret joinGameResp
         game = gameState;
-        /*import {Socket} from "phoenix";
 
-        socketStateLobby = new Socket("ws://localhost:4000/socket", {params: {token: window.userToken}});*/
+        game.global.gameSpecificData = {};
+
         console.log('state_lobby: received: ', gameCode, game.global.playerName, isLeader, joinGameResp);
-        if(gameCode === null || gameCode ===  undefined || game.global.playerName === undefined || game.global.playerName === null){ // this means that something went wrong in joining the game
+        if (gameCode == null || game.global.playerName == null || joinGameResp == null) { // this means that something went wrong in joining the game
             console.error('invalid parameters');
         } else {
             this._players = [];
             this._gameCode = gameCode;
             this._playerName = game.global.playerName;
+            this._maxTeams = joinGameResp.team_size;
+            game.global.gameSpecificData.authToken = joinGameResp.auth_token;
+            game.global.gameSpecificData.userID = joinGameResp.user_id;
 
             //Add this player to be displayed first
             this.updatePlayers([{
                 name: this._playerName,
-                id: 0/*TODO add right id here (This is in the response of join_game)*/,
+                id: joinGameResp.user_id,
                 team: 1,
                 ready: false
             }]);
+
+            game.global.gameSpecificData.channel = game.global.websocket.channel("game:" + gameCode, {auth_token: game.global.gameSpecificData.authToken});
+            game.global.gameSpecificData.channel.join()
+                .receive('ok', this.channelJoinSucess).receive('error', console.log(console.error()));
 
             //Heading of Lobby
             this._nameLabel = game.add.text(game.world.centerX, 80, 'Brettprojekt Lobby: ' + gameCode, { font: '50px Arial', fill: '#ffffff' });
@@ -70,6 +77,11 @@ module.exports = {
             this._initializeCorrect = true;
         }
         //TODO join the gameChannel and hear on updatePlayers
+    },
+
+    channelJoinSucess: function (event) {
+        console.log('state-lobby: successfully joined game channel', event);
+        game.global.gameSpecificData.channel.on('lobby_update', this.updateFromWebsocket);
     },
 
     /**
@@ -172,9 +184,12 @@ module.exports = {
         if(newTeam > this._maxTeams || newTeam < 1){
             throw new Error('team out of bounds[1,'+this._maxTeams+']: ' + newTeam);
         }
-        //TODO sendChange
         this._players[0].team = newTeam;
         this.updatePlayers([this._players[0]]);
+        game.global.gameSpecificData.channel.push('select_team', {
+            auth_token: game.global.gameSpecificData.authToken,
+            team: newTeam
+        });
     },
 
     /**
@@ -206,5 +221,6 @@ module.exports = {
             }
         }
         game.state.start('play', true, false, game, newPlayer);
+        //TODO websocket
     }
 };
