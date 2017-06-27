@@ -23,5 +23,5 @@ Please go in the root of you project and perform the following command:
 ```npm install```
 
 ## Run Server
-1. Run Webpack ```npm run webpack```
-2. Start server ```npm start```
+1. Run Webpack ```npm run webpack``` or add a watch which runs webpack everytime something is changed ```npm run watch```
+1. Start server ```npm start```
