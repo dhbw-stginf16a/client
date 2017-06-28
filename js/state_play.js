@@ -100,6 +100,8 @@ module.exports = {
         this.loadLP();
         //load right Panel
         this.loadRP();
+        //load the two top panels
+      //  this.loadTP();
         //init popup window for the questions
         this.initPopup();
     },
@@ -208,6 +210,14 @@ module.exports = {
         cardRECT.drawRect(1370,20,530,1040);
 
     },
+
+    loadTP: function () {
+      var leftRECT = game.add.graphics(0,0);
+
+        leftRECT.lineStyle(2,0xF2F2F2,1);
+        leftRECT.beginFill(0x333333,1);
+        leftRECT.drawRect(1370,20,530,1040);
+    };
 
     loadPF: function () {
         var xpos = 0;
@@ -344,7 +354,6 @@ module.exports = {
             this.moveTeam(1, 1);
             this.updateScores();
         }
-
     },
 
     /**
