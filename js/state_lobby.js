@@ -55,7 +55,11 @@ module.exports = {
 
             game.global.gameSpecificData.channel = game.global.websocket.channel("game:" + gameCode, {auth_token: game.global.gameSpecificData.authToken});
             game.global.gameSpecificData.channel.join()
-                .receive('ok', this.channelJoinSucess).receive('error', console.log(console.error()));
+                .receive('ok', this.channelJoinSuccess)
+                .receive('error', e => console.log('state-lobby: failed to join gameChannel', e));
+
+            console.log('state_lobby: this is the object reference at the that time', this);
+            game.global.gameSpecificData.channel.on('lobby_update', this.updateFromWebsocket);
 
             //Heading of Lobby
             this._nameLabel = game.add.text(game.world.centerX, 80, 'Brettprojekt Lobby: ' + gameCode, { font: '50px Arial', fill: '#ffffff' });
@@ -79,9 +83,8 @@ module.exports = {
         //TODO join the gameChannel and hear on updatePlayers
     },
 
-    channelJoinSucess: function (event) {
+    channelJoinSuccess: function (event) {
         console.log('state-lobby: successfully joined game channel', event);
-        game.global.gameSpecificData.channel.on('lobby_update', this.updateFromWebsocket);
     },
 
     /**
@@ -89,13 +92,15 @@ module.exports = {
      * @param event the event holding the new values
      */
     updateFromWebsocket: function(event){
-        console.log('lobby-state: received lobby_update', event);
-        this._maxTeams = event.max_teams;
+        console.log('state_lobby: received lobby_update', event, this);
+        if (event.max_teams !== undefined) {
+            this._maxTeams = event.max_teams;
+        }
         if( this._maxTeams < this._players[0].team){
             this.setTeam(1);
         }
         if(this._startGameButton !== undefined){
-            this._startGameButton.visible = event.startable;//TODO only show for leader
+            this._startGameButton.visible = true;//TODO only show for leader
         }
         this.updatePlayers(event.players);
     },
@@ -107,6 +112,7 @@ module.exports = {
      * @param editPlayers the updated player list
      */
     updatePlayers: function(editPlayers){
+        console.log('state_lobby: Received new PlayerList', editPlayers);
         const lineHeight = 20;
         const offset = 120;
         const xOfName = 200;
@@ -186,10 +192,10 @@ module.exports = {
         }
         this._players[0].team = newTeam;
         this.updatePlayers([this._players[0]]);
-        game.global.gameSpecificData.channel.push('select_team', {
+        game.global.gameSpecificData.channel.push('set_team', {
             auth_token: game.global.gameSpecificData.authToken,
             team: newTeam
-        });
+        }).receive('ok', e => console.log('state_lobby: SetTeamReceiveOk', e)).receive('error', e => console.error('state_lobby: SetTeamReceiveError', e));
     },
 
     /**
