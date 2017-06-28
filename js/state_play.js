@@ -212,12 +212,25 @@ module.exports = {
     },
 
     loadTP: function () {
-      var leftRECT = game.add.graphics(0,0);
+
+
+        const posx = 70;
+        const posy = 95;
+        var leftRECT = game.add.graphics(0,0);
+
+
 
         leftRECT.lineStyle(2,0xF2F2F2,1);
         leftRECT.beginFill(0x333333,1);
         leftRECT.drawRect(1370,20,530,1040);
-    };
+
+
+        var rightRECT = game.add.graphics(0,0);
+
+        rightRECT.lineStyle(2,0xF2F2F2,1);
+        rightRECT.beginFill(0x333333,1);
+        rightRECT.drawRect(1370,20,530,1040);
+    },
 
     loadPF: function () {
         var xpos = 0;
