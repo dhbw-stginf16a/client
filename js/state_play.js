@@ -228,7 +228,7 @@ module.exports = {
 
         leftRECT.lineStyle(2,0xF2F2F2,1);
         leftRECT.beginFill(0x333333,1);
-        leftRECT.drawRect(posx,posy,400,150)
+        leftRECT.drawRect(posx,posy,400,150);
         //labels
         const labelposx = posx + 20;
         const labelposy = posy + 10;
