@@ -101,7 +101,7 @@ module.exports = {
         //load right Panel
         this.loadRP();
         //load the two top panels
-      //  this.loadTP();
+        this.loadTP();
         //init popup window for the questions
         this.initPopup();
     },
@@ -212,24 +212,38 @@ module.exports = {
     },
 
     loadTP: function () {
+        const pointsStyle = {
+            font: "30px Arial",
+            fill: game.global.colors.weiss,
+            wordWrap: true,
+            wordWrapWidth: 260,
+            align: "center"
+        };
+        //basic position values
+        const posx = 560;
+        const posy = 110;
 
-
-        const posx = 70;
-        const posy = 95;
+        //panel for the view of the randomly selected categories
         var leftRECT = game.add.graphics(0,0);
-
-
 
         leftRECT.lineStyle(2,0xF2F2F2,1);
         leftRECT.beginFill(0x333333,1);
-        leftRECT.drawRect(1370,20,530,1040);
+        leftRECT.drawRect(posx,posy,400,150)
+        //labels
+        const labelposx = posx + 20;
+        const labelposy = posy + 10;
 
+        game.add.text(labelposx, labelposy, "Category1", pointsStyle);
+        game.add.text(labelposx, labelposy + 40, "Category2", pointsStyle);
+        game.add.text(labelposx, labelposy + 80, "Category3", pointsStyle);
 
+        //panel for the player to category mapping
         var rightRECT = game.add.graphics(0,0);
 
         rightRECT.lineStyle(2,0xF2F2F2,1);
         rightRECT.beginFill(0x333333,1);
-        rightRECT.drawRect(1370,20,530,1040);
+        rightRECT.drawRect(posx + 400,posy,400,150);
+
     },
 
     loadPF: function () {
@@ -239,7 +253,7 @@ module.exports = {
         var lastYpos = 0;
         var offsetX = -20;  //x position of playfield with 0 = middle of screen (+ = right, - = left)
         var offsetY = -190; //y position of playfield with 0 = middle of screen (+ = up, - = down)
-
+        ;
         var pRadius = 20;
 
         var square = game.add.graphics(offsetX + 580, -offsetY+70);
