@@ -28,20 +28,8 @@ var ph, pw;
 var running;
 
 //font styles
-const pointsStyle = {
-    font: "30px Arial",
-    fill: game.global.colors.weiss,
-    wordWrap: true,
-    wordWrapWidth: 260,
-    align: "center"
-};
-const smallStyle = {
-    font: "20px Arial",
-    fill: game.global.colors.weiss,
-    wordWrap: true,
-    wordWrapWidth: 260,
-    align: "center"
-};
+let pointsStyle;
+let smallStyle;
 
 /**
  * Converts the given string to a number assuming it is a string of form #XXXXXX
@@ -93,6 +81,22 @@ module.exports = {
      * @param players the Playerlist from the lobby-state
      */
     init: function (gameState, players) {
+        pointsStyle = {
+            font: "30px Arial",
+            fill: game.global.colors.weiss,
+            wordWrap: true,
+            wordWrapWidth: 260,
+            align: "center"
+        };
+
+        smallStyle = {
+            font: "20px Arial",
+            fill: game.global.colors.weiss,
+            wordWrap: true,
+            wordWrapWidth: 260,
+            align: "center"
+        };
+
         game = gameState;
         console.log('state-play: init was called with: ', gameState, players);
         if (players === undefined) {
