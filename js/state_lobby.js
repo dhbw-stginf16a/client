@@ -41,25 +41,23 @@ module.exports = {
             this._players = [];
             this._gameCode = gameCode;
             this._playerName = game.global.playerName;
-            this._maxTeams = joinGameResp.team_size;
+            this._maxTeams = joinGameResp.team_count;
             game.global.gameSpecificData.authToken = joinGameResp.auth_token;
             game.global.gameSpecificData.userID = joinGameResp.user_id;
 
             //Add this player to be displayed first
             this.updatePlayers([{
                 name: this._playerName,
-                id: joinGameResp.user_id,
+                id: joinGameResp.player_id,
                 team: 1,
                 ready: false
             }]);
 
             game.global.gameSpecificData.channel = game.global.websocket.channel("game:" + gameCode, {auth_token: game.global.gameSpecificData.authToken});
+            game.global.gameSpecificData.channel.on('lobby_update', this.updateFromWebsocket.bind(this));
             game.global.gameSpecificData.channel.join()
-                .receive('ok', this.channelJoinSuccess)
+                .receive('ok', this.channelJoinSuccess.bind(this))
                 .receive('error', e => console.log('state-lobby: failed to join gameChannel', e));
-
-            console.log('state_lobby: this is the object reference at the that time', this);
-            game.global.gameSpecificData.channel.on('lobby_update', this.updateFromWebsocket);
 
             //Heading of Lobby
             this._nameLabel = game.add.text(game.world.centerX, 80, 'Brettprojekt Lobby: ' + gameCode, { font: '50px Arial', fill: '#ffffff' });
@@ -85,6 +83,9 @@ module.exports = {
 
     channelJoinSuccess: function (event) {
         console.log('state-lobby: successfully joined game channel', event);
+        game.global.gameSpecificData.channel.push('trigger_lobby_update', {
+            auth_token: game.global.gameSpecificData.authToken
+        }).receive('error', e => console.error('state_lobby: SetTeamReceiveError', e));
     },
 
     /**
@@ -135,7 +136,7 @@ module.exports = {
                 }
             }
 
-            thisFontStyle.fill = game.global.teamColors[editedPlayer.team];
+            thisFontStyle.fill = game.global.teamColors[editedPlayer.team + 1];
             readyStyle.fill = game.global.colorReady[editedPlayer.ready];
             const stringReady = editedPlayer.ready ? 'ready' : 'unready';
 
@@ -143,7 +144,7 @@ module.exports = {
                 found._lobbyViewName.setStyle(thisFontStyle);
 
                 found._lobbyViewTeam.setStyle(thisFontStyle);
-                found._lobbyViewTeam.text = found.team = editedPlayer.team;
+                found._lobbyViewTeam.text = (found.team = editedPlayer.team) - (-1);
 
                 found._lobbyViewReadiness.text = stringReady;
                 found._lobbyViewReadiness.setStyle(readyStyle);
@@ -158,7 +159,7 @@ module.exports = {
                 editedPlayer._lobbyViewName.anchor.setTo(0);
 
                 //show team on screen
-                editedPlayer._lobbyViewTeam = game.add.text(xOfTeam, positionY, editedPlayer.team, thisFontStyle);
+                editedPlayer._lobbyViewTeam = game.add.text(xOfTeam, positionY, editedPlayer.team - (-1), thisFontStyle);
                 editedPlayer._lobbyViewTeam.anchor.setTo(0);
 
                 //show readiness on screen
@@ -175,7 +176,7 @@ module.exports = {
      */
     changeTeam: function () {
         console.log('state_lobby: wanted to change the team', this._players);
-        const newTeam = this._players[0].team >= this._maxTeams ? 1 : this._players[0].team + 1;
+        const newTeam = (this._players[0].team + 1) % this._maxTeams;
         this.setTeam(newTeam);
     },
 
@@ -187,8 +188,8 @@ module.exports = {
      * @throws Error if the newTeam is out of bounds
      */
     setTeam: function (newTeam) {
-        if(newTeam > this._maxTeams || newTeam < 1){
-            throw new Error('team out of bounds[1,'+this._maxTeams+']: ' + newTeam);
+        if (newTeam >= this._maxTeams || newTeam < 0) {
+            throw new Error('team out of bounds[0,' + (this._maxTeams - 1) + ']: ' + newTeam);
         }
         this._players[0].team = newTeam;
         this.updatePlayers([this._players[0]]);

@@ -195,7 +195,7 @@ module.exports = {
         for (var i = 0; i < this._players.length; i++) {
             pointsStyle.fill = game.global.teamColors[this._players[i].team];
             this._players[i]._nameDisplay = game.add.text(nicknamePosX, offsetPlayerY + (i * distanceToNewPlayer), this._players[i].name, pointsStyle);
-            this._players[i]._teamDisplay = game.add.text(teamPosX, offsetPlayerY + (i * distanceToNewPlayer), this._players[i].team, pointsStyle);
+            this._players[i]._teamDisplay = game.add.text(teamPosX, offsetPlayerY + (i * distanceToNewPlayer), this._players[i].team - (-1), pointsStyle);
             this._players[i]._scoreDisplay = game.add.text(pointsPosX, offsetPlayerY + (i * distanceToNewPlayer), amountOfPositions - this._teamMarkers[this._players[i].team]._position, pointsStyle);
         }
 
@@ -331,7 +331,7 @@ module.exports = {
                     this._teamMarkers[team].drawCircle(positions[84].x, positions[84].y, 20);
                     this._teamMarkers[team].inputEnabled = true;
                     this._teamMarkers[team].input.enableDrag();
-                    this._teamMarkers[team].anchor.set((team - 1) / 4, (team - 1) / 4);
+                    this._teamMarkers[team].anchor.set(team / 4, team / 4);
                     this._teamMarkers[team]._position = amountOfPositions;
                 }
             }
@@ -341,7 +341,7 @@ module.exports = {
         //moving the Player when mouse is clicked
         game.input.onDown.add(doSomething, this);
         function doSomething() {
-            this.moveTeam(1, 1);
+            this.moveTeam(0, 1);
             this.updateScores();
         }
 
