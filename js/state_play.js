@@ -27,6 +27,22 @@ var ph, pw;
 //Stores if the question popup is open or not
 var running;
 
+//font styles
+const pointsStyle = {
+    font: "30px Arial",
+    fill: game.global.colors.weiss,
+    wordWrap: true,
+    wordWrapWidth: 260,
+    align: "center"
+};
+const smallStyle = {
+    font: "20px Arial",
+    fill: game.global.colors.weiss,
+    wordWrap: true,
+    wordWrapWidth: 260,
+    align: "center"
+};
+
 /**
  * Converts the given string to a number assuming it is a string of form #XXXXXX
  * where X = [0-9A-Fa-f]
@@ -142,20 +158,6 @@ module.exports = {
      * Loads the left Panel and draws all stuff needed for it
      */
     loadLP: function () {
-        const pointsStyle = {
-            font: "30px Arial",
-            fill: game.global.colors.weiss,
-            wordWrap: true,
-            wordWrapWidth: 260,
-            align: "center"
-        };
-        const smallStyle = {
-            font: "20px Arial",
-            fill: game.global.colors.weiss,
-            wordWrap: true,
-            wordWrapWidth: 260,
-            align: "center"
-        };
         const posx = 20;
         const posy = 20;
 
@@ -212,13 +214,6 @@ module.exports = {
     },
 
     loadTP: function () {
-        const pointsStyle = {
-            font: "30px Arial",
-            fill: game.global.colors.weiss,
-            wordWrap: true,
-            wordWrapWidth: 260,
-            align: "center"
-        };
         //basic position values
         const posx = 560;
         const posy = 110;
@@ -230,12 +225,19 @@ module.exports = {
         leftRECT.beginFill(0x333333,1);
         leftRECT.drawRect(posx,posy,400,150);
         //labels
-        const labelposx = posx + 20;
+        const leftlabelposx = posx + 20;
         const labelposy = posy + 10;
+        const leftdifficultylabelposx = posx + 370;
+        const rightlabelposx = posx + 420;
 
-        game.add.text(labelposx, labelposy, "Category1", pointsStyle);
-        game.add.text(labelposx, labelposy + 40, "Category2", pointsStyle);
-        game.add.text(labelposx, labelposy + 80, "Category3", pointsStyle);
+        game.add.text(leftlabelposx, labelposy, "Category1", pointsStyle);
+        game.add.text(leftlabelposx, labelposy + 40, "Category2", pointsStyle);
+        game.add.text(leftlabelposx, labelposy + 80, "Category3", pointsStyle);
+
+
+        game.add.text(leftdifficultylabelposx, labelposy, "diff1", pointsStyle);
+        game.add.text(leftdifficultylabelposx, labelposy + 40, "diff2", pointsStyle);
+        game.add.text(leftdifficultylabelposx, labelposy + 80, "diff3", pointsStyle);
 
         //panel for the player to category mapping
         var rightRECT = game.add.graphics(0,0);
@@ -243,6 +245,20 @@ module.exports = {
         rightRECT.lineStyle(2,0xF2F2F2,1);
         rightRECT.beginFill(0x333333,1);
         rightRECT.drawRect(posx + 400,posy,400,150);
+
+        //game.add.text(rightlabelposx, labelposy, "player1", smallStyle);
+        //game.add.text(rightlabelposx, labelposy + 25, "player2", smallStyle);
+        //game.add.text(rightlabelposx, labelposy + 50, "player3", smallStyle);
+        //game.add.text(rightlabelposx, labelposy + 75, "player4", smallStyle);
+        //game.add.text(rightlabelposx, labelposy + 100, "player5", smallStyle);
+
+
+        //Teams
+        //game.add.text(rightlabelposx, labelposy, "TeamOfP1", smallStyle);
+        //game.add.text(rightlabelposx, labelposy + 25, "TeamOfP2", smallStyle);
+        //game.add.text(rightlabelposx, labelposy + 50, "TeamOfP3", smallStyle);
+        //game.add.text(rightlabelposx, labelposy + 75, "TeamOfP4", smallStyle);
+        //game.add.text(rightlabelposx, labelposy + 100, "TeamOfP5", smallStyle);
 
     },
 
