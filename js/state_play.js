@@ -189,11 +189,11 @@ module.exports = {
         game.add.text(pointsPosX, offsetHeadingY, "Points", pointsStyle);
 
         //Points of the players team
-        pointsStyle.fill = game.global.teamColors[this._players[0].team]; //TODO maybe search properly for the player
+        pointsStyle.fill = game.global.teamColors[this._players[0].team - (-1)]; //TODO maybe search properly for the player
         this._pointsDisp = game.add.text(posx + 170, posy + 20, "0", pointsStyle);
 
         for (var i = 0; i < this._players.length; i++) {
-            pointsStyle.fill = game.global.teamColors[this._players[i].team];
+            pointsStyle.fill = game.global.teamColors[this._players[i].team - (-1)];
             this._players[i]._nameDisplay = game.add.text(nicknamePosX, offsetPlayerY + (i * distanceToNewPlayer), this._players[i].name, pointsStyle);
             this._players[i]._teamDisplay = game.add.text(teamPosX, offsetPlayerY + (i * distanceToNewPlayer), this._players[i].team - (-1), pointsStyle);
             this._players[i]._scoreDisplay = game.add.text(pointsPosX, offsetPlayerY + (i * distanceToNewPlayer), amountOfPositions - this._teamMarkers[this._players[i].team]._position, pointsStyle);
@@ -327,7 +327,7 @@ module.exports = {
                 const team = player.team;
                 if (this._teamMarkers[team] == undefined) {
                     this._teamMarkers[team] = game.add.graphics(0, 0);
-                    this._teamMarkers[team].beginFill(convertHexcodeToDecimal(game.global.teamColors[team]), 1);
+                    this._teamMarkers[team].beginFill(convertHexcodeToDecimal(game.global.teamColors[team - (-1)]), 1);
                     this._teamMarkers[team].drawCircle(positions[84].x, positions[84].y, 20);
                     this._teamMarkers[team].inputEnabled = true;
                     this._teamMarkers[team].input.enableDrag();

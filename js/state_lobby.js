@@ -72,15 +72,23 @@ module.exports = {
             this._startGameButton.anchor.setTo(1, 0);
             this._startGameButton.visible = true; //TODO change back to false
 
+            this._toggleReadyButton = game.add.button(game.world.width / 2, game.world.height - 100, 'button', this.toggleReady, this, 2, 1, 0);
+            this._toggleReadyButton.anchor.setTo(0.5, 0);
+
             //copy gameCode
             this._CopyButton = game.add.button(game.world.width, 0, 'copy', function () {copyToClipboard(this._gameCode);}, this, 1, 0, 2);
             this._CopyButton.anchor.setTo(1, 0);
 
             this._initializeCorrect = true;
         }
-        //TODO join the gameChannel and hear on updatePlayers
     },
 
+    /**
+     * This gets toggled by the response of the game channel join.
+     *
+     * It triggers an forced lobby_update
+     * @param event the data from the websocket answer
+     */
     channelJoinSuccess: function (event) {
         console.log('state-lobby: successfully joined game channel', event);
         game.global.gameSpecificData.channel.push('trigger_lobby_update', {
@@ -197,6 +205,18 @@ module.exports = {
             auth_token: game.global.gameSpecificData.authToken,
             team: newTeam
         }).receive('ok', e => console.log('state_lobby: SetTeamReceiveOk', e)).receive('error', e => console.error('state_lobby: SetTeamReceiveError', e));
+    },
+
+    /**
+     * Toggles the readiness of the player at position 0 in this.players and broadcasts the change to the server
+     */
+    toggleReady: function () {
+        this._players[0].ready = !this._players[0].ready;
+        this.updatePlayers([this._players[0]]);
+        game.global.gameSpecificData.channel.push('ready', {
+            auth_token: game.global.gameSpecificData.authToken,
+            ready: this._players[0].ready
+        }).receive('ok', e => console.log('state_lobby: readyOk', e)).receive('error', e => console.error('state_lobby: readyError', e));
     },
 
     /**
