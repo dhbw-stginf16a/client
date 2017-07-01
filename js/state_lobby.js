@@ -2,7 +2,7 @@
  * Created by andreas on 13.06.17.
  */
 /*
-TODO diplay game ID maybe in a (readOnly) TextField
+ TODO add go ready button
     maybe also a copy to clipboard button
  */
 
@@ -25,29 +25,39 @@ module.exports = {
      * Initializes the state lobby
      * @param gameState the gameObject
      * @param gameCode the gameCode of this game
-     * @param playerName the playersName
      * @param isLeader true if this player is the leader of the game
+     * @param joinGameResp the response of the websocket Request join_game
      */
-    init: function (gameState, gameCode, playerName, isLeader) {
+    init: function (gameState, gameCode, isLeader, joinGameResp) {
+        //TODO interpret joinGameResp
         game = gameState;
-        /*import {Socket} from "phoenix";
 
-        socketStateLobby = new Socket("ws://localhost:4000/socket", {params: {token: window.userToken}});*/
-        console.log('state_lobby: received: ', gameCode, playerName, isLeader);
-        if(gameCode === null || gameCode ===  undefined || playerName === undefined || playerName === null){ // this means that something went wrong in joining the game
+        game.global.gameSpecificData = {};
 
+        console.log('state_lobby: received: ', gameCode, game.global.playerName, isLeader, joinGameResp);
+        if (gameCode == null || game.global.playerName == null || joinGameResp == null) { // this means that something went wrong in joining the game
+            console.error('invalid parameters');
         } else {
             this._players = [];
             this._gameCode = gameCode;
-            this._playerName = playerName;
+            this._playerName = game.global.playerName;
+            this._maxTeams = joinGameResp.team_count;
+            game.global.gameSpecificData.authToken = joinGameResp.auth_token;
+            game.global.gameSpecificData.userID = joinGameResp.user_id;
 
             //Add this player to be displayed first
             this.updatePlayers([{
-                name: playerName,
-                id: 0/*TODO add right id here (This is in the response of join_game)*/,
+                name: this._playerName,
+                id: joinGameResp.player_id,
                 team: 1,
                 ready: false
             }]);
+
+            game.global.gameSpecificData.channel = game.global.websocket.channel("game:" + gameCode, {auth_token: game.global.gameSpecificData.authToken});
+            game.global.gameSpecificData.channel.on('lobby_update', this.updateFromWebsocket.bind(this));
+            game.global.gameSpecificData.channel.join()
+                .receive('ok', this.channelJoinSuccess.bind(this))
+                .receive('error', e => console.log('state-lobby: failed to join gameChannel', e));
 
             //Heading of Lobby
             this._nameLabel = game.add.text(game.world.centerX, 80, 'Brettprojekt Lobby: ' + gameCode, { font: '50px Arial', fill: '#ffffff' });
@@ -62,13 +72,28 @@ module.exports = {
             this._startGameButton.anchor.setTo(1, 0);
             this._startGameButton.visible = true; //TODO change back to false
 
+            this._toggleReadyButton = game.add.button(game.world.width / 2, game.world.height - 100, 'button', this.toggleReady, this, 2, 1, 0);
+            this._toggleReadyButton.anchor.setTo(0.5, 0);
+
             //copy gameCode
             this._CopyButton = game.add.button(game.world.width, 0, 'copy', function () {copyToClipboard(this._gameCode);}, this, 1, 0, 2);
             this._CopyButton.anchor.setTo(1, 0);
 
             this._initializeCorrect = true;
         }
-        //TODO join the gameChannel and hear on updatePlayers
+    },
+
+    /**
+     * This gets toggled by the response of the game channel join.
+     *
+     * It triggers an forced lobby_update
+     * @param event the data from the websocket answer
+     */
+    channelJoinSuccess: function (event) {
+        console.log('state-lobby: successfully joined game channel', event);
+        game.global.gameSpecificData.channel.push('trigger_lobby_update', {
+            auth_token: game.global.gameSpecificData.authToken
+        }).receive('error', e => console.error('state_lobby: SetTeamReceiveError', e));
     },
 
     /**
@@ -76,13 +101,15 @@ module.exports = {
      * @param event the event holding the new values
      */
     updateFromWebsocket: function(event){
-        console.log('lobby-state: received lobby_update', event);
-        this._maxTeams = event.max_teams;
+        console.log('state_lobby: received lobby_update', event, this);
+        if (event.max_teams !== undefined) {
+            this._maxTeams = event.max_teams;
+        }
         if( this._maxTeams < this._players[0].team){
             this.setTeam(1);
         }
         if(this._startGameButton !== undefined){
-            this._startGameButton.visible = event.startable;//TODO only show for leader
+            this._startGameButton.visible = true;//TODO only show for leader
         }
         this.updatePlayers(event.players);
     },
@@ -94,6 +121,7 @@ module.exports = {
      * @param editPlayers the updated player list
      */
     updatePlayers: function(editPlayers){
+        console.log('state_lobby: Received new PlayerList', editPlayers);
         const lineHeight = 20;
         const offset = 120;
         const xOfName = 200;
@@ -116,7 +144,7 @@ module.exports = {
                 }
             }
 
-            thisFontStyle.fill = game.global.teamColors[editedPlayer.team];
+            thisFontStyle.fill = game.global.teamColors[editedPlayer.team + 1];
             readyStyle.fill = game.global.colorReady[editedPlayer.ready];
             const stringReady = editedPlayer.ready ? 'ready' : 'unready';
 
@@ -124,7 +152,7 @@ module.exports = {
                 found._lobbyViewName.setStyle(thisFontStyle);
 
                 found._lobbyViewTeam.setStyle(thisFontStyle);
-                found._lobbyViewTeam.text = found.team = editedPlayer.team;
+                found._lobbyViewTeam.text = (found.team = editedPlayer.team) - (-1);
 
                 found._lobbyViewReadiness.text = stringReady;
                 found._lobbyViewReadiness.setStyle(readyStyle);
@@ -139,7 +167,7 @@ module.exports = {
                 editedPlayer._lobbyViewName.anchor.setTo(0);
 
                 //show team on screen
-                editedPlayer._lobbyViewTeam = game.add.text(xOfTeam, positionY, editedPlayer.team, thisFontStyle);
+                editedPlayer._lobbyViewTeam = game.add.text(xOfTeam, positionY, editedPlayer.team - (-1), thisFontStyle);
                 editedPlayer._lobbyViewTeam.anchor.setTo(0);
 
                 //show readiness on screen
@@ -156,7 +184,7 @@ module.exports = {
      */
     changeTeam: function () {
         console.log('state_lobby: wanted to change the team', this._players);
-        const newTeam = this._players[0].team >= this._maxTeams ? 1 : this._players[0].team + 1;
+        const newTeam = (this._players[0].team + 1) % this._maxTeams;
         this.setTeam(newTeam);
     },
 
@@ -168,12 +196,27 @@ module.exports = {
      * @throws Error if the newTeam is out of bounds
      */
     setTeam: function (newTeam) {
-        if(newTeam > this._maxTeams || newTeam < 1){
-            throw new Error('team out of bounds[1,'+this._maxTeams+']: ' + newTeam);
+        if (newTeam >= this._maxTeams || newTeam < 0) {
+            throw new Error('team out of bounds[0,' + (this._maxTeams - 1) + ']: ' + newTeam);
         }
-        //TODO sendChange
         this._players[0].team = newTeam;
         this.updatePlayers([this._players[0]]);
+        game.global.gameSpecificData.channel.push('set_team', {
+            auth_token: game.global.gameSpecificData.authToken,
+            team: newTeam
+        }).receive('ok', e => console.log('state_lobby: SetTeamReceiveOk', e)).receive('error', e => console.error('state_lobby: SetTeamReceiveError', e));
+    },
+
+    /**
+     * Toggles the readiness of the player at position 0 in this.players and broadcasts the change to the server
+     */
+    toggleReady: function () {
+        this._players[0].ready = !this._players[0].ready;
+        this.updatePlayers([this._players[0]]);
+        game.global.gameSpecificData.channel.push('ready', {
+            auth_token: game.global.gameSpecificData.authToken,
+            ready: this._players[0].ready
+        }).receive('ok', e => console.log('state_lobby: readyOk', e)).receive('error', e => console.error('state_lobby: readyError', e));
     },
 
     /**
@@ -205,5 +248,6 @@ module.exports = {
             }
         }
         game.state.start('play', true, false, game, newPlayer);
+        //TODO websocket
     }
 };
