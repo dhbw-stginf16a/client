@@ -213,7 +213,7 @@ module.exports = {
     toggleReady: function () {
         this._players[0].ready = !this._players[0].ready;
         this.updatePlayers([this._players[0]]);
-        game.global.gameSpecificData.channel.push('ready', {
+        game.global.gameSpecificData.channel.push('set_ready', {
             auth_token: game.global.gameSpecificData.authToken,
             ready: this._players[0].ready
         }).receive('ok', e => console.log('state_lobby: readyOk', e)).receive('error', e => console.error('state_lobby: readyError', e));
