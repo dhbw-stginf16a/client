@@ -74,9 +74,10 @@ module.exports = {
      * **IMPORTANT**
      * All Assets used here should already be loaded in state-load because preloud ist called after init
      * @param game The global game handle
-     * @param players the Playerlist from the lobby-state
+     * @param players the player list from the lobby-state
+     * @param event the payload from the first round_preparation
      */
-    init: function (gameState, players) {
+    init: function (gameState, players, event) {
         game = gameState;
         console.log('state-play: init was called with: ', gameState, players);
         if (players === undefined) {

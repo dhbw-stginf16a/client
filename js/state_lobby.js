@@ -55,6 +55,7 @@ module.exports = {
 
             game.global.gameSpecificData.channel = game.global.websocket.channel("game:" + gameCode, {auth_token: game.global.gameSpecificData.authToken});
             game.global.gameSpecificData.channel.on('lobby_update', this.updateFromWebsocket.bind(this));
+            game.global.gameSpecificData.channel.on('round_preparation', this.roundPreparationStartGame.bind(this));
             game.global.gameSpecificData.channel.join()
                 .receive('ok', this.channelJoinSuccess.bind(this))
                 .receive('error', e => console.log('state-lobby: failed to join gameChannel', e));
@@ -71,6 +72,9 @@ module.exports = {
             this._startGameButton = game.add.button(game.world.width - 100, game.world.height - 100, 'start_game', this.startGame, this, 1, 0, 2);
             this._startGameButton.anchor.setTo(1, 0);
             this._startGameButton.visible = true; //TODO change back to false
+
+            this._startGameButton = game.add.button(0, 0, 'start_game', this.startGameDummy, this, 1, 0, 2);
+            this._startGameButton.anchor.setTo(0, 0);
 
             this._toggleReadyButton = game.add.button(game.world.width / 2, game.world.height - 100, 'button', this.toggleReady, this, 2, 1, 0);
             this._toggleReadyButton.anchor.setTo(0.5, 0);
@@ -235,7 +239,38 @@ module.exports = {
 
     update: function () {},
 
+    /**
+     * Gets called if the round_preparation is triggered and starts the play state.
+     * @param event the paylod from the websocket
+     */
+    roundPreparationStartGame: function (event) {
+        if (this._startedGame !== true) {
+            const newPlayer = [];
+            for (const i in this._players) {
+                if (this._players[i] != null) {
+                    newPlayer.push({
+                        name: this._players[i].name,
+                        team: this._players[i].team,
+                        id: this._players[i].id,
+                        ready: false
+                    });
+                }
+            }
+            game.state.start('play', true, false, game, newPlayer, event);
+            this._startedGame = true;
+        }
+    },
+
+    /**
+     * Starts the game by triggering the round_preparation on the Server
+     */
     startGame: function () {
+        game.global.gameSpecificData.channel.push('start_game', {
+            auth_token: game.global.gameSpecificData.authToken
+        }).receive('ok', e => console.log('state_lobby: startGameOk', e)).receive('error', e => console.error('state_lobby: startGameError', e));
+    },
+
+    startGameDummy: function () {
         const newPlayer = [];
         for (const i in this._players) {
             if (this._players[i] != null) {
