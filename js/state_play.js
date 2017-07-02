@@ -4,12 +4,12 @@
 let game;
 
 //--------- Global Vars for the PlayState
-var tween = null;
-var popup;
-var button;
+let tween = null;
+let popup;
+let button;
 //--------- Global Vars for the Playfield
 const amountOfPositions = 84;
-var positions = [1,2];
+let positions = [1,2];
 //--------- Global Vars for Left Panel
 
 
@@ -17,18 +17,19 @@ var positions = [1,2];
 //Time available for answering the questions (in seconds)
 const time = 60;
 //progressBar object
-var progressBar;
+let progressBar;
 //Value between 0 and 1
-var progress;
+let progress;
 //Time when the Question Windows was opened
-var startTime;
+let startTime;
 //Position of the Elements
-var ph, pw;
+let ph, pw;
 //Stores if the question popup is open or not
-var running;
+let running;
 
 //font styles
 let pointsStyle;
+let categoryStyle;
 let smallStyle;
 
 /**
@@ -38,8 +39,8 @@ let smallStyle;
  */
 function convertHexcodeToDecimal(stringToConvert) {
     stringToConvert = stringToConvert.toUpperCase();
-    var newNumber = 0;
-    for (var i = 1; i <= 6; i++) {
+    let newNumber = 0;
+    for (let i = 1; i <= 6; i++) {
         const char = stringToConvert.charAt(i);
         newNumber = (newNumber << 4);
         if (char >= '0' && char <= '9') {
@@ -76,12 +77,40 @@ module.exports = {
 
     /**
      * **IMPORTANT**
-     * All Assets used here should already be loaded in state-load because preloud ist called after init
+     * All Assets used here should already be loaded in state-load because preload is called after init
      * @param game The global game handle
      * @param players the Playerlist from the lobby-state
      */
     init: function (gameState, players) {
+
+        game = gameState;
+        console.log('state-play: init was called with: ', gameState, players);
+
+        if (players === undefined) {
+            throw new Error('State-lobby: The players received were undefined');
+        }
+        this._players = players;
+
+        //Show Name of the screen
+        let nameLabel = game.add.text(game.world.centerX, 80, 'Brettprojekt Play State', {
+            font: '50px Arial',
+            fill: '#ffffff'
+        });
+        nameLabel.anchor.setTo(0.5, 0.5);
+
         pointsStyle = {
+            font: "30px Arial",
+            fill: game.global.colors.weiss,
+            wordWrap: true,
+            wordWrapWidth: 260,
+            align: "center"
+        };
+
+        /*
+         * needs to be different from pointsStyle
+         * pointsStyle.fill is changed during below
+         */
+        categoryStyle = {
             font: "30px Arial",
             fill: game.global.colors.weiss,
             wordWrap: true,
@@ -96,20 +125,6 @@ module.exports = {
             wordWrapWidth: 260,
             align: "center"
         };
-
-        game = gameState;
-        console.log('state-play: init was called with: ', gameState, players);
-        if (players === undefined) {
-            throw new Error('State-lobby: The players received were undefined');
-        }
-        this._players = players;
-
-        //Show Name of the screen
-        var nameLabel = game.add.text(game.world.centerX, 80, 'Brettprojekt Play State', {
-            font: '50px Arial',
-            fill: '#ffffff'
-        });
-        nameLabel.anchor.setTo(0.5, 0.5);
 
         //load Playfield
         this.loadPF();
@@ -135,8 +150,8 @@ module.exports = {
 
 
         if(running){
-            var d = new Date;
-            var timeNow = d.getTime();
+            let d = new Date;
+            let timeNow = d.getTime();
 
             progress = (timeNow - startTime) / (time * 1000);
             //console.log("progress: " + progress);
@@ -166,7 +181,7 @@ module.exports = {
         const posy = 20;
 
         //frame
-        var controllRECT = game.add.graphics(0, 0);
+        let controllRECT = game.add.graphics(0, 0);
         controllRECT.lineStyle(2,0xF2F2F2,1);
         controllRECT.beginFill(0x333333,1);
         controllRECT.drawRect(posx,posy,530,1040);
@@ -174,7 +189,7 @@ module.exports = {
         //points
         game.add.text(posx + 20, posy + 20, "POINTS:", pointsStyle);
 
-        var graphics = game.add.graphics(0,0);
+        let graphics = game.add.graphics(0,0);
         graphics.lineStyle(2, 0xF2F2F2, 1);
 
 
@@ -200,7 +215,7 @@ module.exports = {
         pointsStyle.fill = game.global.teamColors[this._players[0].team]; //TODO maybe search properly for the player
         this._pointsDisp = game.add.text(posx + 170, posy + 20, "0", pointsStyle);
 
-        for (var i = 0; i < this._players.length; i++) {
+        for (let i = 0; i < this._players.length; i++) {
             pointsStyle.fill = game.global.teamColors[this._players[i].team];
             this._players[i]._nameDisplay = game.add.text(nicknamePosX, offsetPlayerY + (i * distanceToNewPlayer), this._players[i].name, pointsStyle);
             this._players[i]._teamDisplay = game.add.text(teamPosX, offsetPlayerY + (i * distanceToNewPlayer), this._players[i].team, pointsStyle);
@@ -210,7 +225,7 @@ module.exports = {
     },
 
     loadRP: function () {
-        var cardRECT = game.add.graphics(0, 0)
+        let cardRECT = game.add.graphics(0, 0)
         cardRECT.lineStyle(2,0xF2F2F2,1);
         cardRECT.beginFill(0x333333,1);
         cardRECT.drawRect(1370,20,530,1040);
@@ -223,68 +238,39 @@ module.exports = {
         const posy = 110;
 
         //panel for the view of the randomly selected categories
-        var leftRECT = game.add.graphics(0,0);
+        let leftRECT = game.add.graphics(0,0);
 
         leftRECT.lineStyle(2,0xF2F2F2,1);
         leftRECT.beginFill(0x333333,1);
         leftRECT.drawRect(posx,posy,400,150);
-        //labels
-        const leftlabelposx = posx + 20;
-        const labelposy = posy + 10;
-        const leftdifficultylabelposx = posx + 370;
-        const rightlabelposx = posx + 420;
-
-        game.add.text(leftlabelposx, labelposy, "Category1", pointsStyle);
-        game.add.text(leftlabelposx, labelposy + 40, "Category2", pointsStyle);
-        game.add.text(leftlabelposx, labelposy + 80, "Category3", pointsStyle);
-
-
-        game.add.text(leftdifficultylabelposx, labelposy, "diff1", pointsStyle);
-        game.add.text(leftdifficultylabelposx, labelposy + 40, "diff2", pointsStyle);
-        game.add.text(leftdifficultylabelposx, labelposy + 80, "diff3", pointsStyle);
 
         //panel for the player to category mapping
-        var rightRECT = game.add.graphics(0,0);
+        let rightRECT = game.add.graphics(0,0);
 
         rightRECT.lineStyle(2,0xF2F2F2,1);
         rightRECT.beginFill(0x333333,1);
         rightRECT.drawRect(posx + 400,posy,400,150);
-
-        //game.add.text(rightlabelposx, labelposy, "player1", smallStyle);
-        //game.add.text(rightlabelposx, labelposy + 25, "player2", smallStyle);
-        //game.add.text(rightlabelposx, labelposy + 50, "player3", smallStyle);
-        //game.add.text(rightlabelposx, labelposy + 75, "player4", smallStyle);
-        //game.add.text(rightlabelposx, labelposy + 100, "player5", smallStyle);
-
-
-        //Teams
-        //game.add.text(rightlabelposx, labelposy, "TeamOfP1", smallStyle);
-        //game.add.text(rightlabelposx, labelposy + 25, "TeamOfP2", smallStyle);
-        //game.add.text(rightlabelposx, labelposy + 50, "TeamOfP3", smallStyle);
-        //game.add.text(rightlabelposx, labelposy + 75, "TeamOfP4", smallStyle);
-        //game.add.text(rightlabelposx, labelposy + 100, "TeamOfP5", smallStyle);
-
     },
 
     loadPF: function () {
-        var xpos = 0;
-        var ypos = 0;
-        var lastXpos = 0;
-        var lastYpos = 0;
-        var offsetX = -20;  //x position of playfield with 0 = middle of screen (+ = right, - = left)
-        var offsetY = -190; //y position of playfield with 0 = middle of screen (+ = up, - = down)
-        ;
-        var pRadius = 20;
+        let xpos = 0;
+        let ypos = 0;
+        let lastXpos = 0;
+        let lastYpos = 0;
+        let offsetX = -20;  //x position of playfield with 0 = middle of screen (+ = right, - = left)
+        let offsetY = -190; //y position of playfield with 0 = middle of screen (+ = up, - = down)
 
-        var square = game.add.graphics(offsetX + 580, -offsetY+70);
+        let pRadius = 20;
+
+        let square = game.add.graphics(offsetX + 580, -offsetY+70);
         square.anchor.set(0.5);
         square.lineStyle(2,0xF2F2F2,1);
         square.beginFill(0x333333,1);
         square.drawRect(0,0,800,800);
 
-        var graphics = game.add.graphics(0,0);
+        let graphics = game.add.graphics(0,0);
 
-        for(var i=0; i<85;i++){
+        for(let i=0; i<85;i++){
             positions[i] = {x: game.world.centerX+xpos+offsetX, y:game.world.centerY+ypos-offsetY};
             if(i%7 === 0){ //draws special fields (currently every 7th field is special)
                 graphics.anchor.set(0.5);
@@ -367,14 +353,14 @@ module.exports = {
         graphics.beginFill(0x000000, 1);
         graphics.lineStyle(2,0xf2f2f2,1);
         graphics.drawRect(game.world.centerX-140+offsetX,game.world.centerY-20,280,220)
-        var style = { font: "90px Arial", fill: "#f2f2f2", wordWrap: true, wordWrapWidth: 260, align: "center"};
+        let style = { font: "90px Arial", fill: "#f2f2f2", wordWrap: true, wordWrapWidth: 260, align: "center"};
         let text = game.add.text(game.world.centerX+offsetX, game.world.centerY+90, "GOAL", style);
         text.anchor.set(0.5);
     },
 
     /**
      * Initialises the Teammarkers based on the given playerlist
-     * @param players the list of players form the lobby state
+     * @param players the list of players from the lobby state
      */
     loadTeammarkes: function (players) {
         this._teamMarkers = {};
@@ -409,7 +395,7 @@ module.exports = {
      * @param amount the amount of score to alter
      */
     moveTeam: function (team, amount) {
-        var playerMarker = this._teamMarkers[team];
+        let playerMarker = this._teamMarkers[team];
         //console.log('play-state: movePlayer', playerMarker, amount);
         playerMarker.x = positions[playerMarker._position - amount].x - positions[84].x;
         playerMarker.y = positions[playerMarker._position - amount].y - positions[84].y;
@@ -422,7 +408,7 @@ module.exports = {
      * @param score the score to set to
      */
     setTeam: function (team, score) {
-        var playerMarker = this._teamMarkers[team];
+        let playerMarker = this._teamMarkers[team];
         //console.log('play-state: movePlayer', playerMarker, amount);
         playerMarker.x = positions[amountOfPositions - score].x - positions[84].x;
         playerMarker.y = positions[amountOfPositions - score].y - positions[84].y;
@@ -434,9 +420,38 @@ module.exports = {
      */
     updateScores: function () {
         this._pointsDisp.text = amountOfPositions - this._teamMarkers[this._players[0].team]._position;//TODO maybe look properly for the player
-        for (var i = 0; i < this._players.length; i++) {
+        for (let i = 0; i < this._players.length; i++) {
             this._players[i]._scoreDisplay.text = amountOfPositions - this._teamMarkers[this._players[i].team]._position;
         }
+    },
+
+
+    updateCategories: function () {
+        const posx = 560;
+        const posy = 110;
+
+        const leftpanelposx = posx + 20;
+        const panelposy = posy + 10;
+        const leftdifficultypanelposx = posx + 310;
+        const rightpanelposx = posx + 420;
+        const solvingPlayerposx = rightpanelposx + 150;
+
+        game.add.text(leftpanelposx, panelposy, "Category1", categoryStyle);
+        game.add.text(leftpanelposx, panelposy + 40, "Category2", categoryStyle);
+        game.add.text(leftpanelposx, panelposy + 80, "Category3", categoryStyle);
+
+
+        game.add.text(leftdifficultypanelposx, panelposy, "diff1", categoryStyle);
+        game.add.text(leftdifficultypanelposx, panelposy + 40, "diff2", categoryStyle);
+        game.add.text(leftdifficultypanelposx, panelposy + 80, "diff3", categoryStyle);
+        game.add.text(rightpanelposx, panelposy, "Cat_1", categoryStyle);
+        game.add.text(rightpanelposx, panelposy + 40, "Cat_2", categoryStyle);
+        game.add.text(rightpanelposx, panelposy + 80, "Cat_3", categoryStyle);
+
+
+        game.add.text(solvingPlayerposx, panelposy, "SolvingP1", categoryStyle);
+        game.add.text(solvingPlayerposx, panelposy + 40, "SolvingP2", categoryStyle);
+        game.add.text(solvingPlayerposx, panelposy + 80, "SolvingP3", categoryStyle);
     },
 
     openPopup: function () {
@@ -445,7 +460,7 @@ module.exports = {
         popup.visible = true;
 
         //
-        var d = new Date;
+        let d = new Date;
         startTime = d.getTime();
         running = true;
 
@@ -478,7 +493,7 @@ module.exports = {
 
     initPopup: function () {
         //Add Start Button
-        var startButton = game.add.button(game.world.width*0.9, game.world.height*0.5, 'button', this.openPopup, this, 1, 0, 2);
+        let startButton = game.add.button(game.world.width*0.9, game.world.height*0.5, 'button', this.openPopup, this, 1, 0, 2);
         startButton.anchor.set(0.5);
 
         //  You can drag the pop-up window around
@@ -494,7 +509,7 @@ module.exports = {
         ph = (popup.height / 2) - 8;
 
         //  And click the close button to close it down again
-        var closeButton = game.make.sprite(pw, -ph, 'close');
+        let closeButton = game.make.sprite(pw, -ph, 'close');
         closeButton.inputEnabled = true;
         closeButton.input.priorityID = 1;
         closeButton.input.useHandCursor = true;
@@ -504,16 +519,16 @@ module.exports = {
         pw = (popup.width / 2) - 15;
         ph = (popup.height / 2) - 50;
 
-        var question = game.make.sprite(-pw, -ph, 'question');
-        var text_question = game.make.text(5, 20, 'How much is the fish?', { font: '50px Arial', fill: '#f2f2f2' });
+        let question = game.make.sprite(-pw, -ph, 'question');
+        let text_question = game.make.text(5, 20, 'How much is the fish?', { font: '50px Arial', fill: '#f2f2f2' });
         question.addChild(text_question);
 
         //Position the answer left field
         pw = (popup.width / 2) - 15;
         ph = (popup.height / 2) - 200;
 
-        var answer_left = game.make.button(-pw, -ph, 'answer_left', this.onWrongAnswerClicked, this, 1, 0, 2);
-        var text_left = game.make.text(5, 20, 'a', { font: '50px Arial', fill: '#f2f2f2' });
+        let answer_left = game.make.button(-pw, -ph, 'answer_left', this.onWrongAnswerClicked, this, 1, 0, 2);
+        let text_left = game.make.text(5, 20, 'a', { font: '50px Arial', fill: '#f2f2f2' });
         answer_left.addChild(text_left);
 
         answer_left.inputEnabled = true;
@@ -522,22 +537,22 @@ module.exports = {
         pw = (popup.width / 2) - 15;
         ph = (popup.height / 2) - 350;
 
-        var answer_left2 = game.make.button(-pw, -ph, 'answer_left', this.onRightAnswerClicked, this, 1, 0, 2);
-        var text_left2 = game.make.text(5, 20, 'c', { font: '50px Arial', fill: '#f2f2f2' });
+        let answer_left2 = game.make.button(-pw, -ph, 'answer_left', this.onRightAnswerClicked, this, 1, 0, 2);
+        let text_left2 = game.make.text(5, 20, 'c', { font: '50px Arial', fill: '#f2f2f2' });
         answer_left2.addChild(text_left2);
 
         pw = (popup.width / 2) - 410;
         ph = (popup.height / 2) - 200;
 
-        var answer_right = game.make.button(-pw, -ph, 'answer_right', this.onWrongAnswerClicked, this, 1, 0, 2);
-        var text_right = game.make.text(60, 20, 'b', { font: '50px Arial', fill: '#f2f2f2' });
+        let answer_right = game.make.button(-pw, -ph, 'answer_right', this.onWrongAnswerClicked, this, 1, 0, 2);
+        let text_right = game.make.text(60, 20, 'b', { font: '50px Arial', fill: '#f2f2f2' });
         answer_right.addChild(text_right);
 
         pw = (popup.width / 2) - 410;
         ph = (popup.height / 2) - 350;
 
-        var answer_right2 = game.make.button(-pw, -ph, 'answer_right', this.onWrongAnswerClicked, this, 1, 0, 2);
-        var text_right2 = game.make.text(60, 20, 'd', { font: '50px Arial', fill: '#f2f2f2' });
+        let answer_right2 = game.make.button(-pw, -ph, 'answer_right', this.onWrongAnswerClicked, this, 1, 0, 2);
+        let text_right2 = game.make.text(60, 20, 'd', { font: '50px Arial', fill: '#f2f2f2' });
         answer_right2.addChild(text_right2);
 
 
@@ -558,6 +573,14 @@ module.exports = {
 
         //  Hide it awaiting a click
         popup.scale.set(0.1);
+    },
+
+    onRoundPreparation: function () {
+
+    },
+
+    onSetCategories: function () {
+
     },
 
     onRightAnswerClicked: function () {
