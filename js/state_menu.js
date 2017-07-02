@@ -16,10 +16,10 @@ module.exports = {
         nameLabel.anchor.setTo(0.5, 0.5);
 
         //Add Start Button
-        let startButton = game.add.button(game.world.centerX, game.world.centerY, 'button', this.start, this, 1, 0, 2);
+        let startButton = game.add.button(game.world.centerX, game.world.centerY, 'button', this.createGame, this, 1, 0, 2);
         startButton.anchor.set(0);
 
-        let startWithGameCode = game.add.button(game.world.centerX, game.world.centerY + 100, 'button', this.startFromCode, this, 1, 0, 2);
+        let startWithGameCode = game.add.button(game.world.centerX, game.world.centerY + 100, 'button', this.joinGame, this, 1, 0, 2);
         startWithGameCode.anchor.set(0);
 
         this._inputPlayerName = game.add.inputField(game.world.centerX - 200, game.world.centerY, {
@@ -53,37 +53,78 @@ module.exports = {
         this._inputGameCode.setText(game.global.GET['joinGame']);
     },
 
-    start: function () {
+    createGame: function () {
         //Go to the lobby state
-        game.state.start('lobby');
-        //TODO create Game
-    },
-    
-    startFromCode: function () {
-        //TODO Websockets
+        //game.state.start('lobby');
         const playerName = this._inputPlayerName.text.text;
         console.log('state-menu: value of name', playerName);
-        if(playerName !== null && playerName !== undefined && playerName !== ''){
+        if(playerName !== null && playerName !== undefined && playerName !== '') {
+            game.global.channel.main.push('create_game').receive('ok', resp => {this.receiveCreatedGame(resp, playerName)});
+        }else{
+            console.error('state_menu: Invalid player name');
+        }
+    },
+
+    joinGame: function () {
+        const playerName = this._inputPlayerName.text.text;
+        console.log('state-menu: value of name', playerName);
+        if(playerName !== null && playerName !== undefined && playerName !== '') {
             //Go to the play state
             const gameCode = this._inputGameCode.text.text;
             console.log('state-menu: value of gameCode', gameCode);
-            if(gameCode !== null && gameCode !== undefined && gameCode !== ''){
-                var newQuerry = '?';
-                for(const id in game.global.GET){
-                    if(id !== 'joinGame'){
-                        newQuerry += id + '=' + game.global.GET[id] + '&';
-                    }
-                }
-                newQuerry+='joinGame='+gameCode;
+            if (gameCode !== null && gameCode !== undefined && gameCode !== '') {
+                this.startFromCode(gameCode, playerName, false);
+            }else {
+                console.error('state_menu: Invalid gameCode');
+            }
+        }else{
+            console.error('state_menu: Invalid player name');
+        }
+    },
 
-                var newUrl = location.href.replace(location.search, newQuerry);
-                if (location.search == "") {
-                    newUrl = location.href + newQuerry;
-                }
+    /**
+     * This gets called after the response of createGame
+     * https://github.com/dhbw-stginf16a/documentation/blob/master/api.md#request-main---create_game-create-a-new-game
+     *
+     * @param resp the websocket response
+     * @param playerName the display name of the player
+     */
+    receiveCreatedGame: function (resp, playerName) {
+        console.log('state_menu: response of createGame', resp);
+        this.startFromCode(resp.game_id, playerName, true);
+    },
 
-                window.history.pushState({}, gameCode, newUrl);
-                game.state.start('lobby', true, false, game, gameCode, playerName, true);
+    /**
+     * Starts the next state
+     * @param gameID the gameID to pass
+     * @param playerName the playerName
+     * @param leader true if the game was created just now
+     */
+    startFromCode: function (gameID, playerName, leader) {
+        //Assembling URL for joining the game
+        let newQuerry = '?';
+        for(const id in game.global.GET){
+            if(id !== 'joinGame'){
+                newQuerry += id + '=' + game.global.GET[id] + '&';
             }
         }
+        newQuerry+='joinGame='+gameID;
+
+        let newUrl = location.href.replace(location.search, newQuerry);
+        if (location.search == "") {
+            newUrl = location.href + newQuerry;
+        }
+
+        //Joining channel
+        game.global.playerName = playerName;
+
+        game.global.channel.main.push('join_game', {username: playerName, game_id: gameID})
+            .receive('ok',
+                resp =>{
+                    window.history.pushState({}, gameID, newUrl);
+                    game.state.start('lobby', true, false, game, gameID, leader, resp);
+                })
+            .receive('error', console.error);
+        //game.state.start('lobby', true, false, game, gameID, leader);
     }
 };
