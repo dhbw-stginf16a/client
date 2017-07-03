@@ -4,6 +4,7 @@
 let game;
 
 //--------- Global Vars for the PlayState
+let categories;
 let tween = null;
 let popup;
 let button;
@@ -222,11 +223,10 @@ module.exports = {
             this._players[i]._teamDisplay = game.add.text(teamPosX, offsetPlayerY + (i * distanceToNewPlayer), this._players[i].team - (-1), pointsStyle);
             this._players[i]._scoreDisplay = game.add.text(pointsPosX, offsetPlayerY + (i * distanceToNewPlayer), amountOfPositions - this._teamMarkers[this._players[i].team]._position, pointsStyle);
         }
-
     },
 
     loadRP: function () {
-        let cardRECT = game.add.graphics(0, 0)
+        let cardRECT = game.add.graphics(0, 0);
         cardRECT.lineStyle(2,0xF2F2F2,1);
         cardRECT.beginFill(0x333333,1);
         cardRECT.drawRect(1370,20,530,1040);
@@ -426,7 +426,6 @@ module.exports = {
         }
     },
 
-
     updateCategories: function () {
         const posx = 560;
         const posy = 110;
@@ -437,6 +436,7 @@ module.exports = {
         const rightpanelposx = posx + 420;
         const solvingPlayerposx = rightpanelposx + 150;
 
+        //left Panel
         game.add.text(leftpanelposx, panelposy, "Category1", categoryStyle);
         game.add.text(leftpanelposx, panelposy + 40, "Category2", categoryStyle);
         game.add.text(leftpanelposx, panelposy + 80, "Category3", categoryStyle);
@@ -445,6 +445,8 @@ module.exports = {
         game.add.text(leftdifficultypanelposx, panelposy, "diff1", categoryStyle);
         game.add.text(leftdifficultypanelposx, panelposy + 40, "diff2", categoryStyle);
         game.add.text(leftdifficultypanelposx, panelposy + 80, "diff3", categoryStyle);
+
+        //right panel
         game.add.text(rightpanelposx, panelposy, "Cat_1", categoryStyle);
         game.add.text(rightpanelposx, panelposy + 40, "Cat_2", categoryStyle);
         game.add.text(rightpanelposx, panelposy + 80, "Cat_3", categoryStyle);
@@ -580,8 +582,11 @@ module.exports = {
 
     },
 
-    onSetCategories: function () {
-
+    onCategoryClicked: function () {
+        game.global.gameSpecificData.channel.push('set_categories', {
+            auth_token: game.global.gameSpecificData.authToken,
+            team: newTeam
+        }).receive('ok', e => console.log('state_lobby: SetTeamReceiveOk', e)).receive('error', e => console.error('state_play: SetCategoryReceiveError', e));
     },
 
     onRightAnswerClicked: function () {
