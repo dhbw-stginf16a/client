@@ -4,9 +4,10 @@
 let game;
 
 //--------- Global Vars for the PlayState
-let categories = ["category1", "category2", "category3"];
+let categories = {'category1': -1, 'category2': -1, 'category3': -1};
 let tween = null;
 let popup;
+let diffpopup;
 let button;
 //--------- Global Vars for the Playfield
 const amountOfPositions = 84;
@@ -142,6 +143,7 @@ module.exports = {
         this.updateCategories();
         //init popup window for the questions
         this.initPopup();
+        this.initDifficultySelection();
     },
 
     create: function () {
@@ -442,11 +444,12 @@ module.exports = {
         game.add.text(leftpanelposx, panelposy + 40, categories[1], categoryStyle);
         game.add.text(leftpanelposx, panelposy + 80, categories[2], categoryStyle);
 
-        let difficulties = ['1','2','3'];
+
+        game.add.button(leftdifficultypanelposx, panelposy, 'diff1btn', this.onDifficultyBtnClicked, 1, 0, 2);
+        game.add.button(leftdifficultypanelposx, panelposy + 40, 'diff2btn', this.onDifficultyBtnClicked, 1, 0, 2);
+        game.add.button(leftdifficultypanelposx, panelposy + 80, 'diff3btn', this.onDifficultyBtnClicked, 1, 0, 2);
 
 
-        game.add.text(leftdifficultypanelposx, panelposy + 40, "diff2", categoryStyle);
-        game.add.text(leftdifficultypanelposx, panelposy + 80, "diff3", categoryStyle);
 
         //right panel
         game.add.text(rightpanelposx, panelposy, "Cat_1", categoryStyle);
@@ -584,12 +587,41 @@ module.exports = {
 
     },
 
+    initDifficultySelection: function () {
+        pw = game.world.centerX;
+        ph = game.world.centerY;
+
+        let diff1Btn = game.make.button(-pw, -ph - 30, 'diff1', this.onDiffPopupBtnClicked, this, 1, 0, 2);
+        let diff2Btn = game.make.button(-pw, -ph, 'diff2', this.onDiffPopupBtnClicked, this, 1, 0, 2);
+        let diff3Btn = game.make.button(-pw, -ph + 30, 'diff3', this.onDiffPopupBtnClicked, this, 1, 0, 2);
+
+        diffpopup.addChild(diff1Btn);
+        diffpopup.addChild(diff2Btn);
+        diffpopup.addChild(diff3Btn);
+
+        diffpopup.scale.set(0.1);
+    },
+
     onCategoryClicked: function () {
         game.global.gameSpecificData.channel.push('set_categories', {
             auth_token: game.global.gameSpecificData.authToken,
             categories: categories
         }).receive('ok', e => console.log('state_lobby: SetCategoryReceiveOk', e)).receive('error', e => console.error('state_play: SetCategoryReceiveError', e));
+    },
 
+    onDifficultyBtnClicked: function () {
+        tween = game.add.tween(popup.scale).to( {x: 1, y: 1}, 1000, Phaser.Easing.Linear, true);
+    },
+
+    onDiffPopupBtnClicked: function () {
+        if (this.key === 'diff1') {
+            //categories[] = 1;
+        } else if (this.key === 'diff2') {
+            //categories[] = 2;
+        } else {
+            //categories[] = 3;
+        }
+        this.parent.initDifficultySelection();
     },
 
     onRightAnswerClicked: function () {
