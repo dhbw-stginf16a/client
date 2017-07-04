@@ -4,7 +4,7 @@
 let game;
 
 //--------- Global Vars for the PlayState
-let categories;
+let categories = ["category1", "category2", "category3"];
 let tween = null;
 let popup;
 let button;
@@ -131,7 +131,7 @@ module.exports = {
         //load Playfield
         this.loadPF();
         //load Playermarkers
-        this.loadTeammarkes(this._players);
+        this.loadTeammarkers(this._players);
 
         //load left Panel
         this.loadLP();
@@ -139,6 +139,7 @@ module.exports = {
         this.loadRP();
         //load the two top panels
         this.loadTP();
+        this.updateCategories();
         //init popup window for the questions
         this.initPopup();
     },
@@ -148,8 +149,6 @@ module.exports = {
     },
 
     update: function () {
-
-
 
         if(running){
             let d = new Date;
@@ -363,7 +362,7 @@ module.exports = {
      * Initialises the Teammarkers based on the given playerlist
      * @param players the list of players from the lobby state
      */
-    loadTeammarkes: function (players) {
+    loadTeammarkers: function (players) {
         this._teamMarkers = {};
         for (const aktPlayer in players) {
             const player = players[aktPlayer];
@@ -380,7 +379,7 @@ module.exports = {
                 }
             }
         }
-        console.log('play-state: loadTeammarkes', this._teamMarkers);
+        console.log('play-state: loadTeammarkers', this._teamMarkers);
 
         //moving the Player when mouse is clicked
         game.input.onDown.add(doSomething, this);
@@ -427,6 +426,8 @@ module.exports = {
     },
 
     updateCategories: function () {
+        console.log("updating categories");
+
         const posx = 560;
         const posy = 110;
 
@@ -437,12 +438,13 @@ module.exports = {
         const solvingPlayerposx = rightpanelposx + 150;
 
         //left Panel
-        game.add.text(leftpanelposx, panelposy, "Category1", categoryStyle);
-        game.add.text(leftpanelposx, panelposy + 40, "Category2", categoryStyle);
-        game.add.text(leftpanelposx, panelposy + 80, "Category3", categoryStyle);
+        game.add.text(leftpanelposx, panelposy, categories[0], categoryStyle);
+        game.add.text(leftpanelposx, panelposy + 40, categories[1], categoryStyle);
+        game.add.text(leftpanelposx, panelposy + 80, categories[2], categoryStyle);
+
+        let difficulties = ['1','2','3'];
 
 
-        game.add.text(leftdifficultypanelposx, panelposy, "diff1", categoryStyle);
         game.add.text(leftdifficultypanelposx, panelposy + 40, "diff2", categoryStyle);
         game.add.text(leftdifficultypanelposx, panelposy + 80, "diff3", categoryStyle);
 
@@ -585,8 +587,9 @@ module.exports = {
     onCategoryClicked: function () {
         game.global.gameSpecificData.channel.push('set_categories', {
             auth_token: game.global.gameSpecificData.authToken,
-            team: newTeam
-        }).receive('ok', e => console.log('state_lobby: SetTeamReceiveOk', e)).receive('error', e => console.error('state_play: SetCategoryReceiveError', e));
+            categories: categories
+        }).receive('ok', e => console.log('state_lobby: SetCategoryReceiveOk', e)).receive('error', e => console.error('state_play: SetCategoryReceiveError', e));
+
     },
 
     onRightAnswerClicked: function () {

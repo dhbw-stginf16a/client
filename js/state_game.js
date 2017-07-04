@@ -65,7 +65,7 @@ game.global = {
 
 //Join the main Channel of the websocket and store a refference to both the socket and the channel in game.global
 //game.global.websocket = new Socket("ws://cerium.lschuermann.xyz:64231/socket", {params: {token: undefined}});
-game.global.websocket = new Socket("ws://212.47.232.80:4000/socket", {params: {token: undefined}});
+game.global.websocket = new Socket("wss://api.brettprojekt.online/socket", {params: {token: undefined}});
 game.global.websocket.connect();
 
 game.global.channel.main = game.global.websocket.channel("main", {});
