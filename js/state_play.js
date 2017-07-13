@@ -354,7 +354,7 @@ module.exports = {
         graphics.anchor.set(0.5);
         graphics.beginFill(0x000000, 1);
         graphics.lineStyle(2,0xf2f2f2,1);
-        graphics.drawRect(game.world.centerX-140+offsetX,game.world.centerY-20,280,220)
+        graphics.drawRect(game.world.centerX-140+offsetX,game.world.centerY-20,280,220);
         let style = { font: "90px Arial", fill: "#f2f2f2", wordWrap: true, wordWrapWidth: 260, align: "center"};
         let text = game.add.text(game.world.centerX+offsetX, game.world.centerY+90, "GOAL", style);
         text.anchor.set(0.5);
@@ -435,20 +435,19 @@ module.exports = {
 
         const leftpanelposx = posx + 20;
         const panelposy = posy + 10;
-        const leftdifficultypanelposx = posx + 310;
+        const leftdifficultypanelposx = posx + 270;
         const rightpanelposx = posx + 420;
         const solvingPlayerposx = rightpanelposx + 150;
 
         //left Panel
-        game.add.text(leftpanelposx, panelposy, categories[0], categoryStyle);
-        game.add.text(leftpanelposx, panelposy + 40, categories[1], categoryStyle);
-        game.add.text(leftpanelposx, panelposy + 80, categories[2], categoryStyle);
+        game.add.text(leftpanelposx, panelposy, "Category1", categoryStyle);
+        game.add.text(leftpanelposx, panelposy + 40, "Category2", categoryStyle);
+        game.add.text(leftpanelposx, panelposy + 80, "Category3", categoryStyle);
 
 
-        game.add.button(leftdifficultypanelposx, panelposy, 'diff1btn', this.onDifficultyBtnClicked, 1, 0, 2);
-        game.add.button(leftdifficultypanelposx, panelposy + 40, 'diff2btn', this.onDifficultyBtnClicked, 1, 0, 2);
-        game.add.button(leftdifficultypanelposx, panelposy + 80, 'diff3btn', this.onDifficultyBtnClicked, 1, 0, 2);
-
+        game.add.button(leftdifficultypanelposx, panelposy, 'button', this.onDifficultyBtnClicked, 1, 0, 2);
+        game.add.button(leftdifficultypanelposx, panelposy + 45, 'button', this.onDifficultyBtnClicked, 1, 0, 2);
+        game.add.button(leftdifficultypanelposx, panelposy + 90, 'button', this.onDifficultyBtnClicked, 1, 0, 2);
 
 
         //right panel
@@ -591,9 +590,12 @@ module.exports = {
         pw = game.world.centerX;
         ph = game.world.centerY;
 
-        let diff1Btn = game.make.button(-pw, -ph - 30, 'diff1', this.onDiffPopupBtnClicked, this, 1, 0, 2);
-        let diff2Btn = game.make.button(-pw, -ph, 'diff2', this.onDiffPopupBtnClicked, this, 1, 0, 2);
-        let diff3Btn = game.make.button(-pw, -ph + 30, 'diff3', this.onDiffPopupBtnClicked, this, 1, 0, 2);
+        diffpopup = game.add.sprite(game.world.centerX, game.world.centerY, 'popup_bg');
+
+
+        let diff1Btn = game.make.button(-pw, -ph - 30, 'button', this.onDifficultyBtnClicked, this, 1, 0, 2);
+        let diff2Btn = game.make.button(-pw, -ph, 'button', this.onDifficultyBtnClicked, this, 1, 0, 2);
+        let diff3Btn = game.make.button(-pw, -ph + 30, 'button', this.onDifficultyBtnClicked, this, 1, 0, 2);
 
         diffpopup.addChild(diff1Btn);
         diffpopup.addChild(diff2Btn);
@@ -610,17 +612,17 @@ module.exports = {
     },
 
     onDifficultyBtnClicked: function () {
-        tween = game.add.tween(popup.scale).to( {x: 1, y: 1}, 1000, Phaser.Easing.Linear, true);
+        tween = game.add.tween(diffpopup.scale).to( {x: game.centerX, y: game.centerY}, 1000, Phaser.Easing.Linear, true);
     },
 
     onDiffPopupBtnClicked: function () {
-        if (this.key === 'diff1') {
-            //categories[] = 1;
-        } else if (this.key === 'diff2') {
-            //categories[] = 2;
-        } else {
-            //categories[] = 3;
-        }
+        //if (this.key === 'diff1Btn') {
+        //    //categories[0] = 1;
+        //} else if (this.key === 'diff2Btn') {
+        //    //categories[1] = 2;
+        //} else {
+        //    //categories[2] = 3;
+        //}
         this.parent.initDifficultySelection();
     },
 
