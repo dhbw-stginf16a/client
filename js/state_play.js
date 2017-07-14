@@ -95,11 +95,8 @@ module.exports = {
         this._players = players;
 
         //Show Name of the screen
-<<<<<<< HEAD
-        var nameLabel = game.add.text(game.world.centerX, 80, 'Qzoo', {
-=======
+        //var nameLabel = game.add.text(game.world.centerX, 80, 'Qzoo', {
         let nameLabel = game.add.text(game.world.centerX, 80, 'Brettprojekt Play State', {
->>>>>>> 3f5ce2a838df1bb35a0b55a189426d9804ad550b
             font: '50px Arial',
             fill: '#f7931e'
         });
