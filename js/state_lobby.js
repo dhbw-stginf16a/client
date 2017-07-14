@@ -61,7 +61,7 @@ module.exports = {
                 .receive('error', e => console.log('state-lobby: failed to join gameChannel', e));
 
             //Heading of Lobby
-            this._nameLabel = game.add.text(game.world.centerX, 80, 'Brettprojekt Lobby: ' + gameCode, { font: '50px Arial', fill: '#ffffff' });
+            this._nameLabel = game.add.text(game.world.centerX, 80, 'Qzoo Lobby: ' + gameCode, { font: '50px Arial', fill: '#f7931e' });
             this._nameLabel.anchor.setTo(0.5, 0.5);
 
             //change team button
@@ -76,7 +76,7 @@ module.exports = {
             this._startGameButton = game.add.button(0, 0, 'start_game', this.startGameDummy, this, 1, 0, 2);
             this._startGameButton.anchor.setTo(0, 0);
 
-            this._toggleReadyButton = game.add.button(game.world.width / 2, game.world.height - 100, 'button', this.toggleReady, this, 2, 1, 0);
+            this._toggleReadyButton = game.add.button(game.world.width / 2, game.world.height - 100, 'readyButton', this.toggleReady, this, 1, 0, 2);
             this._toggleReadyButton.anchor.setTo(0.5, 0);
 
             //copy gameCode
@@ -84,6 +84,21 @@ module.exports = {
             this._CopyButton.anchor.setTo(1, 0);
 
             this._initializeCorrect = true;
+
+            //frame
+            var posx = 150;
+            var posy = 100;
+            var controllRECT = game.add.graphics(0, 0);
+            controllRECT.lineStyle(2,0xF2F2F2,1);
+            controllRECT.beginFill(0x333333,0);
+            controllRECT.drawRect(posx,posy,530,850);
+
+            var graphics = game.add.graphics(0,0);
+            graphics.lineStyle(2, 0xF2F2F2, 1);
+
+
+            graphics.moveTo(posx+5,posy+90);
+            graphics.lineTo(posx+525,posy+90);
         }
     },
 
@@ -127,9 +142,9 @@ module.exports = {
     updatePlayers: function(editPlayers){
         console.log('state_lobby: Received new PlayerList', editPlayers);
         const lineHeight = 20;
-        const offset = 120;
+        const offset = 210;
         const xOfName = 200;
-        const xOfTeam = 500;
+        const xOfTeam = 400;
         const xOfReady = 525;
         const thisFontStyle = { font: 'bold 18px Arial'};
         const readyStyle = {font: 'bold 18px Arial'};
@@ -148,9 +163,20 @@ module.exports = {
                 }
             }
 
+            thisFontStyle.fill = "#f2f2f2";
+
+            game.add.text(xOfName, offset-90, "Name", thisFontStyle);
+            game.add.text(xOfTeam, offset-90, "Team", thisFontStyle);
+            game.add.text(xOfReady, offset-90, "Ready?", thisFontStyle);
+
             thisFontStyle.fill = game.global.teamColors[editedPlayer.team + 1];
             readyStyle.fill = game.global.colorReady[editedPlayer.ready];
             const stringReady = editedPlayer.ready ? 'ready' : 'unready';
+
+
+
+
+
 
             if(found !== null){
                 found._lobbyViewName.setStyle(thisFontStyle);

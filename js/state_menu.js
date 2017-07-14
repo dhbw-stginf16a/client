@@ -9,26 +9,25 @@ module.exports = {
         // Add a background image
         // game.add.image(0, 0, 'background');
         // Display the name of the game
-        let nameLabel = game.add.text(game.world.centerX, 80, 'Brettprojekt Menu', {
-            font: '50px Arial',
-            fill: '#ffffff'
-        });
+        let nameLabel = game.add.sprite(game.world.centerX, 300, 'logo');
+        nameLabel.scale.setTo(0.3,0.3);
         nameLabel.anchor.setTo(0.5, 0.5);
 
         //Add Start Button
-        let startButton = game.add.button(game.world.centerX, game.world.centerY, 'button', this.createGame, this, 1, 0, 2);
+        let startButton = game.add.button(game.world.centerX+50, game.world.centerY+100, 'newGameButton', this.createGame, this, 1, 0, 2);
         startButton.anchor.set(0);
 
-        let startWithGameCode = game.add.button(game.world.centerX, game.world.centerY + 100, 'button', this.joinGame, this, 1, 0, 2);
+        let startWithGameCode = game.add.button(game.world.centerX+50, game.world.centerY + 200, 'joinGameButton', this.joinGame, this, 1, 0, 2);
         startWithGameCode.anchor.set(0);
 
-        this._inputPlayerName = game.add.inputField(game.world.centerX - 200, game.world.centerY, {
+        this._inputPlayerName = game.add.inputField(game.world.centerX - 200, game.world.centerY+100, {
             font: '18px Arial',
-            fill: '#000',
+            fill: '#f7931e',
+            backgroundColor: '#333333',
             width: 150,
             padding: 8,
             borderWidth: 1,
-            borderColor: '#000',
+            borderColor: '#f7931e',
             borderRadius: 5,
             placeHolder: 'Name'
         });
@@ -40,15 +39,16 @@ module.exports = {
 
     init: function (gameState) {
         game = gameState;
-        this._inputGameCode = game.add.inputField(game.world.centerX - 200, game.world.centerY + 100, {
+        this._inputGameCode = game.add.inputField(game.world.centerX - 200, game.world.centerY + 200, {
             font: '18px Arial',
-            fill: '#000',
+            fill: '#f7931e',
+            backgroundColor: '#333333',
             width: 150,
             padding: 8,
             borderWidth: 1,
-            borderColor: '#000',
+            borderColor: '#f7931e',
             borderRadius: 5,
-            placeHolder: 'GameId'
+            placeHolder: 'GameID'
         });
         this._inputGameCode.setText(game.global.GET['joinGame']);
     },
